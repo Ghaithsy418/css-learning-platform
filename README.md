@@ -1,30 +1,30 @@
-# 🎯 CSS Grid Interactive Tutorial - معمارية قابلة لإعادة الاستخدام
+# 🎯 CSS Grid Interactive Tutorial - Reusable Architecture
 
-## 📚 نظرة عامة
+## 📚 Overview
 
-هذا مشروع تعليمي تفاعلي لـ CSS Grid مبني بـ React و Tailwind CSS. تم تصميمه بمعمارية نظيفة وقابلة لإعادة الاستخدام بالكامل.
+This is an interactive educational project for Learning CSS (Grid & Flexbox) built with React and Tailwind CSS. It is designed with a clean and fully reusable architecture.
 
-## 🏗️ المعمارية - Architecture
+## 🏗️ Architecture
 
-### المكونات القابلة لإعادة الاستخدام (Reusable Components)
+### Reusable Components
 
-#### 1. **CodeInput** - حقل الإدخال
+#### 1. **CodeInput**
 
 ```jsx
 <CodeInput
   value={state}
   onChange={setState}
-  hint="القيمة المتوقعة"
+  hint="Expected value"
   width="w-40"
   id="unique-id"
 />
 ```
 
-**الاستخدام:** أي حقل إدخال في الكود يحتاج تلميح وتحديث مباشر
+**Usage:** Any code input field that needs a hint and live updates.
 
 ---
 
-#### 2. **CodeEditor** - محرر الكود
+#### 2. **CodeEditor**
 
 ```jsx
 <CodeEditor>
@@ -32,11 +32,11 @@
 </CodeEditor>
 ```
 
-**الاستخدام:** لعرض أكواد برمجية مع خلفية داكنة
+**Usage:** To display code blocks with a dark background.
 
 ---
 
-#### 3. **CodeLine** - سطر الكود
+#### 3. **CodeLine**
 
 ```jsx
 <CodeLine indent={1}>
@@ -44,117 +44,117 @@
 </CodeLine>
 ```
 
-**الخصائص:**
+**Props:**
 
-- `indent`: مستوى المسافة البادئة (0, 1, 2, ...)
+- `indent`: Indentation level (0, 1, 2, ...)
 
 ---
 
-#### 4. **Property** - خاصية CSS
+#### 4. **Property**
 
 ```jsx
 <Property>grid-template-columns</Property>
 ```
 
-**الاستخدام:** لتلوين أسماء الخصائص باللون الوردي
+**Usage:** To color property names pink.
 
 ---
 
-#### 5. **Value** - قيمة CSS
+#### 5. **Value**
 
 ```jsx
 <Value>1fr</Value>
 ```
 
-**الاستخدام:** لتلوين القيم باللون الأخضر
+**Usage:** To color values green.
 
 ---
 
-#### 6. **Comment** - التعليقات
+#### 6. **Comment**
 
 ```jsx
-<Comment>/* تعليق توضيحي */</Comment>
+<Comment>/* Explanatory comment */</Comment>
 ```
 
-**الاستخدام:** لإضافة تعليقات بلون رمادي مائل
+**Usage:** To add gray italic comments.
 
 ---
 
-#### 7. **GridPreview** - معاينة الشبكة
+#### 7. **GridPreview**
 
 ```jsx
-<GridPreview gridStyles={{ display: "grid", gap: "10px" }} label="👇 معاينة:">
+<GridPreview gridStyles={{ display: "grid", gap: "10px" }} label="👇 Preview:">
   <GridItem>1</GridItem>
   <GridItem>2</GridItem>
 </GridPreview>
 ```
 
-**الاستخدام:** لعرض الشبكة مع التحديث المباشر
+**Usage:** To display the grid with live updates.
 
 ---
 
-#### 8. **GridItem** - عنصر الشبكة
+#### 8. **GridItem**
 
 ```jsx
-<GridItem style={{ gridArea: "header" }}>المحتوى</GridItem>
+<GridItem style={{ gridArea: "header" }}>Content</GridItem>
 ```
 
-**الاستخدام:** عناصر داخل الشبكة
+**Usage:** Items inside the grid.
 
 ---
 
-#### 9. **HintBox** - صندوق النصائح
+#### 9. **HintBox**
 
 ```jsx
-<HintBox title="💡 نصائح:">
+<HintBox title="💡 Tips:">
   <ul>
-    <li>نصيحة 1</li>
-    <li>نصيحة 2</li>
+    <li>Tip 1</li>
+    <li>Tip 2</li>
   </ul>
 </HintBox>
 ```
 
-**الاستخدام:** لعرض النصائح والإرشادات
+**Usage:** To display tips and guidance.
 
 ---
 
-#### 10. **AnswerKey** - صندوق الإجابة
+#### 10. **AnswerKey**
 
 ```jsx
 <AnswerKey show={showAnswer} onToggle={() => setShowAnswer(!showAnswer)}>
-  <p>الإجابة الصحيحة هنا</p>
+  <p>Correct answer here</p>
 </AnswerKey>
 ```
 
-**الاستخدام:** لعرض وإخفاء الإجابات
+**Usage:** To toggle answer visibility.
 
 ---
 
-#### 11. **ExerciseSection** - قسم التمرين
+#### 11. **ExerciseSection**
 
 ```jsx
-<ExerciseSection title="التمرين الأول">{/* محتوى التمرين */}</ExerciseSection>
+<ExerciseSection title="Exercise 1">{/* Exercise content */}</ExerciseSection>
 ```
 
-**الاستخدام:** لتنظيم التمارين في أقسام
+**Usage:** To organize exercises into sections.
 
 ---
 
-#### 12. **Explanation** - الشرح
+#### 12. **Explanation**
 
 ```jsx
 <Explanation>
-  <p>شرح التمرين هنا</p>
+  <p>Exercise explanation here</p>
 </Explanation>
 ```
 
-**الاستخدام:** لشرح متطلبات التمرين
+**Usage:** To explain exercise requirements.
 
 ---
 
-## 🔄 كيفية إعادة الاستخدام
+## 🔄 Reusability Examples
 
-### مثال 1: إنشاء تمرين Flexbox
+### Example 1: Creating a Flexbox Exercise
 
 ```jsx
 const FlexboxExercise = () => {
@@ -169,9 +169,9 @@ const FlexboxExercise = () => {
   };
 
   return (
-    <ExerciseSection title="تمرين Flexbox">
+    <ExerciseSection title="Flexbox Exercise">
       <Explanation>
-        <p>أنشئ layout باستخدام Flexbox</p>
+        <p>Create a layout using Flexbox</p>
       </Explanation>
 
       <CodeEditor>
@@ -205,231 +205,79 @@ const FlexboxExercise = () => {
 
 ---
 
-### مثال 2: تمرين Animations
+## 📦 Installation & Usage
 
-```jsx
-const AnimationExercise = () => {
-  const [duration, setDuration] = useState("");
-  const [timing, setTiming] = useState("");
-
-  return (
-    <ExerciseSection title="تمرين التحريك">
-      <CodeEditor>
-        <CodeLine>.animated {"{"}</CodeLine>
-        <CodeLine indent={1}>
-          <Property>animation-duration</Property>:{" "}
-          <CodeInput value={duration} onChange={setDuration} hint="2s" />;
-        </CodeLine>
-        <CodeLine indent={1}>
-          <Property>animation-timing-function</Property>:{" "}
-          <CodeInput value={timing} onChange={setTiming} hint="ease-in-out" />;
-        </CodeLine>
-        <CodeLine>{"}"}</CodeLine>
-      </CodeEditor>
-
-      <HintBox>
-        <ul>
-          <li>
-            جرب: <code>ease</code>, <code>linear</code>,{" "}
-            <code>ease-in-out</code>
-          </li>
-          <li>
-            المدة بالثواني: <code>1s</code>, <code>2s</code>
-          </li>
-        </ul>
-      </HintBox>
-    </ExerciseSection>
-  );
-};
-```
-
----
-
-### مثال 3: تمرين Typography
-
-```jsx
-const TypographyExercise = () => {
-  const [fontSize, setFontSize] = useState("");
-  const [fontWeight, setFontWeight] = useState("");
-  const [lineHeight, setLineHeight] = useState("");
-
-  const textStyles = {
-    fontSize: fontSize || "16px",
-    fontWeight: fontWeight || "normal",
-    lineHeight: lineHeight || "1.5",
-  };
-
-  return (
-    <ExerciseSection title="تمرين النصوص">
-      <CodeEditor>
-        <CodeLine>.text {"{"}</CodeLine>
-        <CodeLine indent={1}>
-          <Property>font-size</Property>:{" "}
-          <CodeInput
-            value={fontSize}
-            onChange={setFontSize}
-            hint="24px"
-            width="w-24"
-          />
-          ;
-        </CodeLine>
-        <CodeLine indent={1}>
-          <Property>font-weight</Property>:{" "}
-          <CodeInput
-            value={fontWeight}
-            onChange={setFontWeight}
-            hint="bold"
-            width="w-24"
-          />
-          ;
-        </CodeLine>
-        <CodeLine indent={1}>
-          <Property>line-height</Property>:{" "}
-          <CodeInput
-            value={lineHeight}
-            onChange={setLineHeight}
-            hint="1.6"
-            width="w-24"
-          />
-          ;
-        </CodeLine>
-        <CodeLine>{"}"}</CodeLine>
-      </CodeEditor>
-
-      <div className="p-5 bg-white rounded border-2">
-        <p style={textStyles}>هذا نص تجريبي لمعاينة التنسيقات</p>
-      </div>
-    </ExerciseSection>
-  );
-};
-```
-
----
-
-## 🎨 التخصيص
-
-### تغيير الألوان
-
-يمكنك تخصيص الألوان بسهولة باستخدام Tailwind:
-
-```jsx
-// بدلاً من purple
-<div className="bg-gradient-to-br from-blue-500 to-blue-800">
-
-// بدلاً من الحدود البنفسجية
-<div className="border-r-4 border-green-500">
-```
-
-### تغيير الخط
-
-```jsx
-<style>{`
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-  
-  body {
-    font-family: 'Tajawal', sans-serif;
-  }
-`}</style>
-```
-
----
-
-## 📦 التثبيت والاستخدام
-
-### 1. إنشاء مشروع React جديد
+### 1. Install Dependencies
 
 ```bash
-npx create-react-app grid-tutorial
-cd grid-tutorial
+npm install
+# or
+pnpm install
 ```
 
-### 2. تثبيت Tailwind CSS
+### 2. Run Locally
 
 ```bash
-npm install -D tailwindcss
-npx tailwindcss init
+npm run dev
+# or
+pnpm dev
 ```
 
-### 3. إعداد Tailwind
+### 3. Build for Production
 
-في `tailwind.config.js`:
-
-```js
-module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-```
-
-في `src/index.css`:
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
-### 4. استخدام المكون
-
-```jsx
-import CSSGridTutorial from "./CSSGridTutorial";
-
-function App() {
-  return <CSSGridTutorial />;
-}
+```bash
+npm run build
 ```
 
 ---
 
-## 🚀 المميزات
+## 🚀 Features
 
-✅ **معمارية نظيفة**: كل مكون قابل لإعادة الاستخدام بشكل مستقل  
-✅ **Tailwind CSS**: تصميم سريع ومرن  
-✅ **TypeScript Ready**: يمكن تحويله بسهولة  
-✅ **RTL Support**: دعم كامل للعربية  
-✅ **Live Preview**: معاينة مباشرة للتغييرات  
-✅ **Responsive**: متجاوب مع جميع الأحجام
-
----
-
-## 💡 أفكار للتوسع
-
-1. **إضافة تمارين أخرى**: Position, Transform, Transitions
-2. **نظام النقاط**: تتبع تقدم الطالب
-3. **حفظ التقدم**: localStorage للحفظ المحلي
-4. **وضع التحدي**: تمارين متقدمة بوقت محدد
-5. **مشاركة الحلول**: QR code أو link للمشاركة
-6. **Dark Mode**: وضع داكن للعيون
+✅ **Clean Architecture**: Each component is independently reusable  
+✅ **React 19 & Vite**: Fast and modern  
+✅ **Tailwind CSS**: Rapid styling  
+✅ **TypeScript**: Fully typed codebase  
+✅ **Responsive Design**: Mobile-friendly sidebar and layouts  
+✅ **Live Preview**: Real-time updates as you type code  
+✅ **Animations**: Smooth transitions using Framer Motion
 
 ---
 
-## 📝 ملاحظات مهمة
+## 💡 Expansion Ideas
 
-- جميع المكونات مستقلة ويمكن استخدامها في أي مشروع
-- التصميم responsive بشكل كامل
-- يمكن تغيير اللغة من RTL إلى LTR بسهولة
-- المكونات تدعم التخصيص الكامل عبر props
-
----
-
-## 🤝 المساهمة
-
-هذه المعمارية مفتوحة للتطوير والتحسين. يمكنك:
-
-- إضافة مكونات جديدة
-- تحسين التصميم
-- إضافة لغات أخرى
-- إضافة ميزات جديدة
+1. **More Exercises**: Position, Transform, Transitions
+2. **Scoring System**: Track student progress
+3. **Save Progress**: Use localStorage
+4. **Challenge Mode**: Timed advanced exercises
+5. **Share Solutions**: QR code or link sharing
+6. **Dark Mode**: Eye-friendly interface
 
 ---
 
-## 📄 الترخيص
+## 📝 Important Notes
 
-هذا المشروع مفتوح المصدر ومتاح للاستخدام الحر.
+- All components are independent and can be used in any project.
+- The design is fully responsive.
+- Supports both RTL (current default) and LTR.
+- Components support full customization via props.
 
 ---
 
-**بالتوفيق في تطوير مشاريعك! 🚀**
+## 🤝 Contribution
+
+This architecture is open for development and improvement. You can:
+
+- Add new components
+- Improve design
+- Add other languages
+- Add new features
+
+---
+
+## 📄 License
+
+This project is open source and available for free use.
+
+---
+
+**Good luck with your project development! 🚀**
