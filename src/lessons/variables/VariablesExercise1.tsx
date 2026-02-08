@@ -64,7 +64,10 @@ const VariablesExercise1: React.FC = () => {
         </Explanation>
 
         {/* Syntax Overview */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+        <div
+          dir="ltr"
+          className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6"
+        >
           <h3 className="text-lg font-bold text-gray-800 mb-4">
             📝 الصيغة الأساسية
           </h3>
@@ -134,7 +137,7 @@ const VariablesExercise1: React.FC = () => {
             🎛️ تحكم في المتغيرات
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div dir="ltr" className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Primary Color */}
             <div className="space-y-2">
               <label className="flex justify-between text-sm font-medium text-gray-700">
@@ -225,7 +228,10 @@ const VariablesExercise1: React.FC = () => {
         </div>
 
         {/* Generated Code */}
-        <div className="bg-gray-900 rounded-xl p-4 font-mono text-sm overflow-x-auto mb-6">
+        <div
+          dir="ltr"
+          className="bg-gray-900 rounded-xl p-4 font-mono text-sm overflow-x-auto mb-6"
+        >
           <p className="text-gray-400 mb-2">/* المتغيرات الحالية */</p>
           <p className="text-purple-400">:root {"{"}</p>
           <p className="text-green-400 mr-4">
@@ -335,7 +341,10 @@ const VariablesExercise1: React.FC = () => {
               <span className="text-2xl">📛</span>
               تسمية واضحة وموحدة
             </h4>
-            <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
+            <div
+              dir="ltr"
+              className="bg-gray-900 rounded-lg p-4 font-mono text-sm"
+            >
               <p className="text-gray-400">/* ✅ أسماء جيدة */</p>
               <p className="text-green-400">--color-primary: #8b5cf6;</p>
               <p className="text-green-400">--color-secondary: #06b6d4;</p>
@@ -354,7 +363,10 @@ const VariablesExercise1: React.FC = () => {
               <span className="text-2xl">📁</span>
               تنظيم المتغيرات في مجموعات
             </h4>
-            <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
+            <div
+              dir="ltr"
+              className="bg-gray-900 rounded-lg p-4 font-mono text-sm"
+            >
               <p className="text-purple-400">:root {"{"}</p>
               <p className="text-gray-400 mr-4">/* الألوان */</p>
               <p className="text-green-400 mr-4">--color-primary: #8b5cf6;</p>
@@ -376,7 +388,10 @@ const VariablesExercise1: React.FC = () => {
               <span className="text-2xl">🛡️</span>
               استخدم قيم احتياطية (Fallback)
             </h4>
-            <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
+            <div
+              dir="ltr"
+              className="bg-gray-900 rounded-lg p-4 font-mono text-sm"
+            >
               <p className="text-gray-400">
                 /* قيمة احتياطية إذا لم يوجد المتغير */
               </p>
@@ -396,7 +411,10 @@ const VariablesExercise1: React.FC = () => {
               <span className="text-2xl">🎨</span>
               السمات (Theming) مع المتغيرات
             </h4>
-            <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
+            <div
+              dir="ltr"
+              className="bg-gray-900 rounded-lg p-4 font-mono text-sm"
+            >
               <p className="text-gray-400">/* الوضع الفاتح (الافتراضي) */</p>
               <p className="text-purple-400">:root {"{"}</p>
               <p className="text-green-400 mr-4">--bg-color: #ffffff;</p>

@@ -186,8 +186,8 @@ const ShadowExercise1: React.FC = () => {
         <HintBox>
           <ul className="mr-5 leading-7">
             <li>
-              <strong>الإزاحة الأفقية:</strong> القيم الموجبة تحرك الظل لليسار،
-              السالبة لليمين
+              <strong>الإزاحة الأفقية:</strong> القيم الموجبة تحرك الظل لليمين،
+              السالبة لليسار
             </li>
             <li>
               <strong>الإزاحة العمودية:</strong> القيم الموجبة تحرك الظل للأسفل،
@@ -198,6 +198,7 @@ const ShadowExercise1: React.FC = () => {
             </li>
             <li>
               <strong>الانتشار:</strong> القيم الموجبة توسع الظل، السالبة تقلصه
+              لحد معين
             </li>
             <li>
               <strong>Inset:</strong> يجعل الظل داخل الصندوق بدلاً من خارجه

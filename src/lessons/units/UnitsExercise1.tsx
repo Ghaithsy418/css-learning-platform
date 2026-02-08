@@ -305,7 +305,7 @@ const UnitsExercise1: React.FC = () => {
             </li>
             <li>
               ✅ استخدم <code className="bg-yellow-200 px-1 rounded">px</code>{" "}
-              فقط للقيم الدقيقة الثابتة مثل الحدود
+              فقط للقيم الدقيقة الثابتة مثل الحدود (Borders)
             </li>
           </ul>
         </div>
