@@ -15,6 +15,9 @@ import GridExercise3 from "./lessons/grid/GridExercise3";
 import FlexboxExercise1 from "./lessons/flexbox/FlexboxExercise1";
 import FlexboxExercise2 from "./lessons/flexbox/FlexboxExercise2";
 import FlexboxExercise3 from "./lessons/flexbox/FlexboxExercise3";
+import ShadowExercise1 from "./lessons/shadows/ShadowExercise1";
+import UnitsExercise1 from "./lessons/units/UnitsExercise1";
+import VariablesExercise1 from "./lessons/variables/VariablesExercise1";
 import QuickReference from "./components/QuickRefrence";
 import FlexboxReference from "./components/FlexboxReference";
 
@@ -115,6 +118,25 @@ const Layout = () => {
           <SidebarLink
             to="/flexbox/3"
             label="3. التمدد (Grow)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+
+          <div className="mt-6 text-xs font-bold text-purple-400 uppercase mb-2 px-3">
+            دروس CSS المتقدمة
+          </div>
+          <SidebarLink
+            to="/shadows/1"
+            label="1. الظلال (Shadows)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/units/1"
+            label="2. الوحدات (px, rem, em)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/variables/1"
+            label="3. المتغيرات (Variables)"
             onClick={() => setIsSidebarOpen(false)}
           />
 
@@ -310,6 +332,47 @@ function App() {
                   color="blue"
                 />
                 <FlexboxExercise3 />
+              </>
+            }
+          />
+
+          {/* Advanced CSS Lessons Routes */}
+          <Route
+            path="shadows/1"
+            element={
+              <>
+                <LessonHeader
+                  title="الظلال في CSS"
+                  description="تعلم استخدام box-shadow و text-shadow لإضافة عمق لتصميماتك."
+                  color="purple"
+                />
+                <ShadowExercise1 />
+              </>
+            }
+          />
+          <Route
+            path="units/1"
+            element={
+              <>
+                <LessonHeader
+                  title="الوحدات في CSS"
+                  description="الفرق بين px و rem و em ومتى تستخدم كل منها."
+                  color="purple"
+                />
+                <UnitsExercise1 />
+              </>
+            }
+          />
+          <Route
+            path="variables/1"
+            element={
+              <>
+                <LessonHeader
+                  title="المتغيرات في CSS"
+                  description="تعلم استخدام CSS Variables وأفضل الممارسات."
+                  color="purple"
+                />
+                <VariablesExercise1 />
               </>
             }
           />
