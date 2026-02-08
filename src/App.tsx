@@ -165,12 +165,6 @@ const Layout = () => {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative bg-linear-to-br from-gray-50 to-gray-100 mt-16 md:mt-0 w-full">
         <style>{`
-                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-                    
-                    body {
-                      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
-                    }
-                    
                     /* Custom Scrollbar for the main area */
                     main::-webkit-scrollbar {
                         width: 8px;
