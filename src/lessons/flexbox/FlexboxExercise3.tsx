@@ -1,27 +1,27 @@
-import { useState, type CSSProperties } from "react";
-import { ExerciseSection } from "../../features/code/ExerciseSection";
-import { Explanation } from "../../features/code/Explanation";
-import CodeEditor from "../../features/code/CodeEditor";
-import CodeLine from "../../features/code/CodeLine";
-import Property from "../../features/cssSyntax/Property";
-import Value from "../../features/cssSyntax/Value";
-import CodeInput from "../../features/code/CodeInput";
-import { HintBox } from "../../features/code/HintBox";
-import { GridPreview } from "../../features/grid/GridPreview";
-import { GridItem } from "../../features/grid/GridItem";
-import { AnswerKey } from "../../features/code/AnswerKey";
+import { useState, type CSSProperties } from 'react';
+import { AnswerKey } from '../../features/code/AnswerKey';
+import CodeEditor from '../../features/code/CodeEditor';
+import CodeInput from '../../features/code/CodeInput';
+import CodeLine from '../../features/code/CodeLine';
+import { ExerciseSection } from '../../features/code/ExerciseSection';
+import { Explanation } from '../../features/code/Explanation';
+import { HintBox } from '../../features/code/HintBox';
+import Property from '../../features/cssSyntax/Property';
+import Value from '../../features/cssSyntax/Value';
+import { GridItem } from '../../features/grid/GridItem';
+import { GridPreview } from '../../features/grid/GridPreview';
 
 const FlexboxExercise3: React.FC = () => {
-  const [flexGrow2, setFlexGrow2] = useState<string>("0");
-  const [flexGrow3, setFlexGrow3] = useState<string>("0");
+  const [flexGrow2, setFlexGrow2] = useState<string>('0');
+  const [flexGrow3, setFlexGrow3] = useState<string>('0');
   const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
   const containerStyles: CSSProperties = {
-    display: "flex",
-    gap: "10px",
-    height: "150px",
-    background: "#eee",
-    padding: "10px",
+    display: 'flex',
+    gap: '10px',
+    height: '150px',
+    background: '#eee',
+    padding: '10px',
   };
 
   return (
@@ -38,21 +38,31 @@ const FlexboxExercise3: React.FC = () => {
 
       <CodeEditor>
         <CodeLine>
-          .item-1 {"{"} <Property>flex-grow</Property>: <Value>0</Value>; {"}"}
+          .item-1 {'{'} <Property>flex-grow</Property>: <Value>0</Value>; {'}'}
         </CodeLine>
-        <CodeLine indent={0}>.item-2 {"{"}</CodeLine>
+        <CodeLine indent={0}>.item-2 {'{'}</CodeLine>
         <CodeLine indent={1}>
-          <Property>flex-grow</Property>:{" "}
-          <CodeInput value={flexGrow2} onChange={setFlexGrow2} width="w-20" />;
+          <Property>flex-grow</Property>:{' '}
+          <CodeInput
+            value={flexGrow2}
+            onChange={setFlexGrow2}
+            width="w-20"
+          />
+          ;
         </CodeLine>
-        <CodeLine indent={0}>{"}"}</CodeLine>
+        <CodeLine indent={0}>{'}'}</CodeLine>
 
-        <CodeLine indent={0}>.item-3 {"{"}</CodeLine>
+        <CodeLine indent={0}>.item-3 {'{'}</CodeLine>
         <CodeLine indent={1}>
-          <Property>flex-grow</Property>:{" "}
-          <CodeInput value={flexGrow3} onChange={setFlexGrow3} width="w-20" />;
+          <Property>flex-grow</Property>:{' '}
+          <CodeInput
+            value={flexGrow3}
+            onChange={setFlexGrow3}
+            width="w-20"
+          />
+          ;
         </CodeLine>
-        <CodeLine indent={0}>{"}"}</CodeLine>
+        <CodeLine indent={0}>{'}'}</CodeLine>
       </CodeEditor>
 
       <HintBox>
@@ -68,32 +78,44 @@ const FlexboxExercise3: React.FC = () => {
         </ul>
       </HintBox>
 
-      <GridPreview gridStyles={containerStyles} label="👇 معاينة التمدد:">
+      <GridPreview
+        gridStyles={containerStyles}
+        label="👇 معاينة التمدد:"
+      >
         <GridItem
-          style={{ width: "100px", background: "#3b82f6", flexGrow: 0 }}
+          style={{ width: '100px', background: '#3b82f6', flexGrow: 0 }}
         >
           Fixed (0)
         </GridItem>
         <GridItem
-          style={{ background: "#ef4444", flexGrow: Number(flexGrow2) || 0 }}
+          style={{ background: '#ef4444', flexGrow: Number(flexGrow2) || 0 }}
         >
           Item 2
         </GridItem>
         <GridItem
-          style={{ background: "#22c55e", flexGrow: Number(flexGrow3) || 0 }}
+          style={{ background: '#22c55e', flexGrow: Number(flexGrow3) || 0 }}
         >
           Item 3
         </GridItem>
       </GridPreview>
 
-      <AnswerKey show={showAnswer} onToggle={() => setShowAnswer(!showAnswer)}>
+      <AnswerKey
+        show={showAnswer}
+        onToggle={() => setShowAnswer(!showAnswer)}
+      >
         <p>
-          <code className="bg-gray-200 px-2 py-1 rounded font-mono">
+          <code
+            dir="ltr"
+            className="bg-gray-200 px-2 py-1 rounded font-mono"
+          >
             Item 2: flex-grow: <strong>2</strong>
           </code>
         </p>
         <p>
-          <code className="bg-gray-200 px-2 py-1 rounded font-mono">
+          <code
+            dir="ltr"
+            className="bg-gray-200 px-2 py-1 rounded font-mono"
+          >
             Item 3: flex-grow: <strong>1</strong>
           </code>
         </p>

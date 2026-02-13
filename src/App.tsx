@@ -1,34 +1,30 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 import {
   BrowserRouter,
-  Routes,
-  Route,
   NavLink,
   Navigate,
+  Route,
+  Routes,
   useLocation,
   useOutlet,
-} from "react-router-dom";
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import GridExercise1 from "./lessons/grid/GridExercise1";
-import GridExercise2 from "./lessons/grid/GridExercise2";
-import GridExercise3 from "./lessons/grid/GridExercise3";
-import FlexboxExercise1 from "./lessons/flexbox/FlexboxExercise1";
-import FlexboxExercise2 from "./lessons/flexbox/FlexboxExercise2";
-import FlexboxExercise3 from "./lessons/flexbox/FlexboxExercise3";
-import ShadowExercise1 from "./lessons/shadows/ShadowExercise1";
-import UnitsExercise1 from "./lessons/units/UnitsExercise1";
-import VariablesExercise1 from "./lessons/variables/VariablesExercise1";
-import QuickReference from "./components/QuickRefrence";
-import FlexboxReference from "./components/FlexboxReference";
-
-// ... [Layout component code remains unchanged, assume it's here or handled by context if we were rewriting whole file, but we are doing chunk replacement]
-// Actually, the user instruction suggests replacing content. I will target the imports and the MainContentWrapper specifically.
-// Wait, replace_file_content target needs only the changed chunk.
-
-// 1. Update Imports
-// 2. Update MainContentWrapper
-
-// Let's do imports first.
+} from 'react-router-dom';
+import FlexboxReference from './components/FlexboxReference';
+import QuickReference from './components/QuickRefrence';
+import FlexboxExercise1 from './lessons/flexbox/FlexboxExercise1';
+import FlexboxExercise2 from './lessons/flexbox/FlexboxExercise2';
+import FlexboxExercise3 from './lessons/flexbox/FlexboxExercise3';
+import GridExercise1 from './lessons/grid/GridExercise1';
+import GridExercise2 from './lessons/grid/GridExercise2';
+import GridExercise3 from './lessons/grid/GridExercise3';
+import PositionExercise1 from './lessons/position/PositionExercise1';
+import PositionExercise2 from './lessons/position/PositionExercise2';
+import ResponsiveExercise1 from './lessons/responsive/ResponsiveExercise1';
+import ResponsiveExercise2 from './lessons/responsive/ResponsiveExercise2';
+import ResponsiveExercise3 from './lessons/responsive/ResponsiveExercise3';
+import ShadowExercise1 from './lessons/shadows/ShadowExercise1';
+import UnitsExercise1 from './lessons/units/UnitsExercise1';
+import VariablesExercise1 from './lessons/variables/VariablesExercise1';
 
 // Layout Component
 const Layout = () => {
@@ -40,7 +36,10 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden" dir="rtl">
+    <div
+      className="flex h-screen bg-gray-50 overflow-hidden"
+      dir="rtl"
+    >
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 w-full bg-purple-900 text-white z-50 p-4 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold flex items-center gap-2">
@@ -51,7 +50,7 @@ const Layout = () => {
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 rounded hover:bg-purple-800 transition-colors"
         >
-          {isSidebarOpen ? "✕" : "☰"}
+          {isSidebarOpen ? '✕' : '☰'}
         </button>
       </div>
 
@@ -68,7 +67,7 @@ const Layout = () => {
         className={`
             fixed md:relative top-0 right-0 h-full w-64 bg-purple-900 text-white shadow-xl flex flex-col z-50 
             transform transition-transform duration-300 ease-in-out pt-16 md:pt-0
-            ${isSidebarOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
+            ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
       `}
       >
         {/* Desktop Header (hidden on mobile) */}
@@ -137,6 +136,31 @@ const Layout = () => {
           <SidebarLink
             to="/variables/1"
             label="3. المتغيرات (Variables)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/responsive/1"
+            label="4. التجاوب (Responsive)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/responsive/2"
+            label="5. نصوص مرنة (clamp)"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/responsive/3"
+            label="6. تغيير التخطيط"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/position/1"
+            label="7. التموضع المطلق"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <SidebarLink
+            to="/position/2"
+            label="7. التثبيت (Sticky)"
             onClick={() => setIsSidebarOpen(false)}
           />
 
@@ -231,8 +255,8 @@ const SidebarLink = ({
       className={({ isActive }) =>
         `block px-4 py-3 rounded-lg transition-all duration-200 ${
           isActive
-            ? "bg-purple-700 text-white shadow-md translate-x-1 font-semibold border-r-4 border-purple-300"
-            : "text-purple-100 hover:bg-purple-800 hover:text-white"
+            ? 'bg-purple-700 text-white shadow-md translate-x-1 font-semibold border-r-4 border-purple-300'
+            : 'text-purple-100 hover:bg-purple-800 hover:text-white'
         }`
       }
     >
@@ -245,8 +269,19 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/grid/1" replace />} />
+        <Route
+          path="/"
+          element={<Layout />}
+        >
+          <Route
+            index
+            element={
+              <Navigate
+                to="/grid/1"
+                replace
+              />
+            }
+          />
 
           {/* Grid Routes */}
           <Route
@@ -371,15 +406,96 @@ function App() {
             }
           />
 
+          <Route
+            path="responsive/1"
+            element={
+              <>
+                <LessonHeader
+                  title="التصميم المتجاوب"
+                  description="كيف تجعل تصميمك يعمل على كل الشاشات."
+                  color="purple"
+                />
+                <ResponsiveExercise1 />
+              </>
+            }
+          />
+
+          <Route
+            path="responsive/2"
+            element={
+              <>
+                <LessonHeader
+                  title="Responsive: نصوص مرنة"
+                  description="استخدام clamp لتغيير أحجام الخطوط بذكاء."
+                  color="purple"
+                />
+                <ResponsiveExercise2 />
+              </>
+            }
+          />
+
+          <Route
+            path="responsive/3"
+            element={
+              <>
+                <LessonHeader
+                  title="تغيير التخطيط المتجاوب"
+                  description="كيفية تحويل الصفوف إلى أعمدة في الشاشات الصغيرة."
+                  color="purple"
+                />
+                <ResponsiveExercise3 />
+              </>
+            }
+          />
+
+          <Route
+            path="position/1"
+            element={
+              <>
+                <LessonHeader
+                  title="خاصية Position"
+                  description="تحريك العناصر بدقة في الصفحة."
+                  color="purple"
+                />
+                <PositionExercise1 />
+              </>
+            }
+          />
+
+          <Route
+            path="position/2"
+            element={
+              <>
+                <LessonHeader
+                  title="Position: التثبيت (Sticky)"
+                  description="كيفية تثبيت العناصر عند التمرير."
+                  color="purple"
+                />
+                <PositionExercise2 />
+              </>
+            }
+          />
+
           {/* Reference Routes */}
           {/* Supporting old path for backward compatibility/bookmarks if any */}
           <Route
             path="reference"
-            element={<Navigate to="/reference/grid" replace />}
+            element={
+              <Navigate
+                to="/reference/grid"
+                replace
+              />
+            }
           />
 
-          <Route path="reference/grid" element={<QuickReference />} />
-          <Route path="reference/flexbox" element={<FlexboxReference />} />
+          <Route
+            path="reference/grid"
+            element={<QuickReference />}
+          />
+          <Route
+            path="reference/flexbox"
+            element={<FlexboxReference />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
@@ -393,10 +509,10 @@ const LessonHeader = ({
 }: {
   title: string;
   description: string;
-  color: "purple" | "blue";
+  color: 'purple' | 'blue';
 }) => (
   <div
-    className={`mb-8 p-6 bg-white rounded-xl shadow-xs border-r-4 ${color === "purple" ? "border-purple-500" : "border-blue-500"}`}
+    className={`mb-8 p-6 bg-white rounded-xl shadow-xs border-r-4 ${color === 'purple' ? 'border-purple-500' : 'border-blue-500'}`}
   >
     <h1 className="text-3xl font-bold text-gray-800 mb-2">{title}</h1>
     <p className="text-gray-600">{description}</p>
