@@ -118,7 +118,6 @@ const JsStringsExercise1: React.FC = () => {
     }
 
     if (sp) {
-      const example = 'أحمد,سارة,محمد';
       if (sp === ',') {
         lines.push({
           type: 'result',

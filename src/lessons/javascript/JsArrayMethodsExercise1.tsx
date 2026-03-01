@@ -34,16 +34,27 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
   /* ── Console 1 ── */
   const console1Lines = useMemo(() => {
-    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] = [];
+    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] =
+      [];
     const cb = mapCallback.trim();
     if (!cb) return lines;
 
-    if (cb.includes('* 2') || cb.includes('*2') || cb.includes('=> n * 2') || cb.includes('=> n*2')) {
-      lines.push({ type: 'result', text: `[1,2,3].map(n => n * 2) → [2, 4, 6] ✅` });
+    if (
+      cb.includes('* 2') ||
+      cb.includes('*2') ||
+      cb.includes('=> n * 2') ||
+      cb.includes('=> n*2')
+    ) {
+      lines.push({
+        type: 'result',
+        text: `[1,2,3].map(n => n * 2) → [2, 4, 6] ✅`,
+      });
     } else if (cb.includes('=>')) {
       try {
-        const arr = [1, 2, 3];
-        lines.push({ type: 'info', text: `map يطبق الدالة على كل عنصر. جرّب: n => n * 2` });
+        lines.push({
+          type: 'info',
+          text: `map يطبق الدالة على كل عنصر. جرّب: n => n * 2`,
+        });
       } catch {
         lines.push({ type: 'error', text: 'خطأ في الصياغة' });
       }
@@ -55,14 +66,26 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
   /* ── Console 2 ── */
   const console2Lines = useMemo(() => {
-    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] = [];
+    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] =
+      [];
     const cb = filterCallback.trim();
     if (!cb) return lines;
 
-    if (cb.includes('> 18') || cb.includes('>18') || cb.includes('>= 19') || cb.includes('>=19')) {
-      lines.push({ type: 'result', text: `[15, 22, 17, 30].filter(age => age > 18) → [22, 30] ✅` });
+    if (
+      cb.includes('> 18') ||
+      cb.includes('>18') ||
+      cb.includes('>= 19') ||
+      cb.includes('>=19')
+    ) {
+      lines.push({
+        type: 'result',
+        text: `[15, 22, 17, 30].filter(age => age > 18) → [22, 30] ✅`,
+      });
     } else if (cb.includes('=>')) {
-      lines.push({ type: 'info', text: `filter يُبقي العناصر التي تُرجع true. جرّب: age => age > 18` });
+      lines.push({
+        type: 'info',
+        text: `filter يُبقي العناصر التي تُرجع true. جرّب: age => age > 18`,
+      });
     } else {
       lines.push({ type: 'info', text: `استخدم سهم: age => age > 18` });
     }
@@ -71,7 +94,8 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
   /* ── Console 3 ── */
   const console3Lines = useMemo(() => {
-    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] = [];
+    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] =
+      [];
     const fd = findCallback.trim();
     const rd = reduceCallback.trim();
     const ri = reduceInit.trim();
@@ -80,15 +104,24 @@ const JsArrayMethodsExercise1: React.FC = () => {
       if (fd.includes('> 20') || fd.includes('>20')) {
         lines.push({ type: 'result', text: `find(n => n > 20) → 25 ✅` });
       } else {
-        lines.push({ type: 'info', text: `find تُرجع أول عنصر يحقق الشرط. جرّب: n => n > 20` });
+        lines.push({
+          type: 'info',
+          text: `find تُرجع أول عنصر يحقق الشرط. جرّب: n => n > 20`,
+        });
       }
     }
 
     if (rd && ri) {
       if ((rd.includes('a + b') || rd.includes('a+b')) && ri === '0') {
-        lines.push({ type: 'result', text: `reduce((a, b) => a + b, 0) → 70 ✅` });
+        lines.push({
+          type: 'result',
+          text: `reduce((a, b) => a + b, 0) → 70 ✅`,
+        });
       } else {
-        lines.push({ type: 'info', text: `reduce تجمع القيم. جرّب: (a, b) => a + b والقيمة الأولية 0` });
+        lines.push({
+          type: 'info',
+          text: `reduce تجمع القيم. جرّب: (a, b) => a + b والقيمة الأولية 0`,
+        });
       }
     } else if (rd) {
       lines.push({ type: 'info', text: `أضف القيمة الأولية (0)` });
@@ -100,22 +133,39 @@ const JsArrayMethodsExercise1: React.FC = () => {
   return (
     <>
       {/* ═══════ Exercise 1: map ═══════ */}
-      <ExerciseSection title="التمرين الأول: map — التحويل" borderColor="amber" lessonId="js-11" exerciseId="ex1" maxPoints={5} inputCount={1}>
+      <ExerciseSection
+        title="التمرين الأول: map — التحويل"
+        borderColor="amber"
+        lessonId="js-11"
+        exerciseId="ex1"
+        maxPoints={5}
+        inputCount={1}
+      >
         <Explanation>
           <p>
-            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">map()</code>{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              map()
+            </code>{' '}
             تُنشئ مصفوفة جديدة بتطبيق دالة على <strong>كل عنصر</strong>.
           </p>
-          <div className="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-200" dir="ltr">
+          <div
+            className="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-200"
+            dir="ltr"
+          >
             <p className="text-sm font-mono text-blue-800">
-              [1, 2, 3].map(<span className="text-purple-600">n =&gt; n * 2</span>) → [2, 4, 6]
+              [1, 2, 3].map(
+              <span className="text-purple-600">n =&gt; n * 2</span>) → [2, 4,
+              6]
             </p>
           </div>
         </Explanation>
 
         <CodeEditor>
           <CodeLine>
-            <JsKeyword>const</JsKeyword> numbers = [<span className="text-amber-600">1</span>, <span className="text-amber-600">2</span>, <span className="text-amber-600">3</span>];
+            <JsKeyword>const</JsKeyword> numbers = [
+            <span className="text-amber-600">1</span>,{' '}
+            <span className="text-amber-600">2</span>,{' '}
+            <span className="text-amber-600">3</span>];
           </CodeLine>
           <CodeLine />
           <CodeLine>
@@ -123,7 +173,14 @@ const JsArrayMethodsExercise1: React.FC = () => {
           </CodeLine>
           <CodeLine>
             <JsKeyword>const</JsKeyword> doubled = numbers.map(
-            <CodeInput value={mapCallback} onChange={setMapCallback} width="w-32" hint="n => n * 2" correctValue="n => n * 2" />);
+            <CodeInput
+              value={mapCallback}
+              onChange={setMapCallback}
+              width="w-32"
+              hint="n => n * 2"
+              correctValue="n => n * 2"
+            />
+            );
           </CodeLine>
           <CodeLine />
           <CodeLine>
@@ -134,26 +191,46 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
         <ConsoleOutput lines={console1Lines} />
 
-        <AnswerKey show={showAnswer1} onToggle={() => setShowAnswer1(!showAnswer1)}>
-          <pre dir="ltr" className="bg-gray-200 px-3 py-2 rounded font-mono text-sm">
-{`const doubled = numbers.map(n => n * 2);
+        <AnswerKey
+          show={showAnswer1}
+          onToggle={() => setShowAnswer1(!showAnswer1)}
+        >
+          <pre
+            dir="ltr"
+            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
+          >
+            {`const doubled = numbers.map(n => n * 2);
 // [2, 4, 6]`}
           </pre>
         </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: filter ═══════ */}
-      <ExerciseSection title="التمرين الثاني: filter — التصفية" borderColor="amber" lessonId="js-11" exerciseId="ex2" maxPoints={5} inputCount={1}>
+      <ExerciseSection
+        title="التمرين الثاني: filter — التصفية"
+        borderColor="amber"
+        lessonId="js-11"
+        exerciseId="ex2"
+        maxPoints={5}
+        inputCount={1}
+      >
         <Explanation>
           <p>
-            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">filter()</code>{' '}
-            تُرجع مصفوفة جديدة تحتوي <strong>فقط</strong> العناصر التي تحقق الشرط.
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              filter()
+            </code>{' '}
+            تُرجع مصفوفة جديدة تحتوي <strong>فقط</strong> العناصر التي تحقق
+            الشرط.
           </p>
         </Explanation>
 
         <CodeEditor>
           <CodeLine>
-            <JsKeyword>const</JsKeyword> ages = [<span className="text-amber-600">15</span>, <span className="text-amber-600">22</span>, <span className="text-amber-600">17</span>, <span className="text-amber-600">30</span>];
+            <JsKeyword>const</JsKeyword> ages = [
+            <span className="text-amber-600">15</span>,{' '}
+            <span className="text-amber-600">22</span>,{' '}
+            <span className="text-amber-600">17</span>,{' '}
+            <span className="text-amber-600">30</span>];
           </CodeLine>
           <CodeLine />
           <CodeLine>
@@ -161,7 +238,14 @@ const JsArrayMethodsExercise1: React.FC = () => {
           </CodeLine>
           <CodeLine>
             <JsKeyword>const</JsKeyword> adults = ages.filter(
-            <CodeInput value={filterCallback} onChange={setFilterCallback} width="w-36" hint="age => age > 18" correctValue="age => age > 18" />);
+            <CodeInput
+              value={filterCallback}
+              onChange={setFilterCallback}
+              width="w-36"
+              hint="age => age > 18"
+              correctValue="age => age > 18"
+            />
+            );
           </CodeLine>
           <CodeLine />
           <CodeLine>
@@ -174,34 +258,59 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
         <HintBox>
           <ul className="mr-5 leading-7">
-            <li><strong>map</strong> → تحوّل كل عنصر (الناتج بنفس الطول)</li>
-            <li><strong>filter</strong> → تختار عناصر محددة (الناتج قد يكون أقصر)</li>
+            <li>
+              <strong>map</strong> → تحوّل كل عنصر (الناتج بنفس الطول)
+            </li>
+            <li>
+              <strong>filter</strong> → تختار عناصر محددة (الناتج قد يكون أقصر)
+            </li>
             <li>كلاهما لا يغير المصفوفة الأصلية</li>
           </ul>
         </HintBox>
 
-        <AnswerKey show={showAnswer2} onToggle={() => setShowAnswer2(!showAnswer2)}>
-          <pre dir="ltr" className="bg-gray-200 px-3 py-2 rounded font-mono text-sm">
-{`const adults = ages.filter(age => age > 18);
+        <AnswerKey
+          show={showAnswer2}
+          onToggle={() => setShowAnswer2(!showAnswer2)}
+        >
+          <pre
+            dir="ltr"
+            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
+          >
+            {`const adults = ages.filter(age => age > 18);
 // [22, 30]`}
           </pre>
         </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: find & reduce ═══════ */}
-      <ExerciseSection title="التمرين الثالث: find و reduce" borderColor="amber" lessonId="js-11" exerciseId="ex3" maxPoints={15} inputCount={3}>
+      <ExerciseSection
+        title="التمرين الثالث: find و reduce"
+        borderColor="amber"
+        lessonId="js-11"
+        exerciseId="ex3"
+        maxPoints={15}
+        inputCount={3}
+      >
         <Explanation>
           <p>
-            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">find()</code>{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              find()
+            </code>{' '}
             تُرجع <strong>أول عنصر</strong> يحقق الشرط، و{' '}
-            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">reduce()</code>{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              reduce()
+            </code>{' '}
             تُجمع كل العناصر في <strong>قيمة واحدة</strong>.
           </p>
         </Explanation>
 
         <CodeEditor>
           <CodeLine>
-            <JsKeyword>const</JsKeyword> nums = [<span className="text-amber-600">10</span>, <span className="text-amber-600">25</span>, <span className="text-amber-600">5</span>, <span className="text-amber-600">30</span>];
+            <JsKeyword>const</JsKeyword> nums = [
+            <span className="text-amber-600">10</span>,{' '}
+            <span className="text-amber-600">25</span>,{' '}
+            <span className="text-amber-600">5</span>,{' '}
+            <span className="text-amber-600">30</span>];
           </CodeLine>
           <CodeLine />
           <CodeLine>
@@ -209,7 +318,14 @@ const JsArrayMethodsExercise1: React.FC = () => {
           </CodeLine>
           <CodeLine>
             <JsKeyword>const</JsKeyword> big = nums.find(
-            <CodeInput value={findCallback} onChange={setFindCallback} width="w-32" hint="n => n > 20" correctValue="n => n > 20" />);
+            <CodeInput
+              value={findCallback}
+              onChange={setFindCallback}
+              width="w-32"
+              hint="n => n > 20"
+              correctValue="n => n > 20"
+            />
+            );
           </CodeLine>
           <CodeLine>
             <JsKeyword>console</JsKeyword>.<JsKeyword>log</JsKeyword>(big);{' '}
@@ -221,8 +337,22 @@ const JsArrayMethodsExercise1: React.FC = () => {
           </CodeLine>
           <CodeLine>
             <JsKeyword>const</JsKeyword> sum = nums.reduce(
-            <CodeInput value={reduceCallback} onChange={setReduceCallback} width="w-36" hint="(a, b) => a + b" correctValue="(a, b) => a + b" />,{' '}
-            <CodeInput value={reduceInit} onChange={setReduceInit} width="w-10" hint="0" correctValue="0" />);
+            <CodeInput
+              value={reduceCallback}
+              onChange={setReduceCallback}
+              width="w-36"
+              hint="(a, b) => a + b"
+              correctValue="(a, b) => a + b"
+            />
+            ,{' '}
+            <CodeInput
+              value={reduceInit}
+              onChange={setReduceInit}
+              width="w-10"
+              hint="0"
+              correctValue="0"
+            />
+            );
           </CodeLine>
           <CodeLine>
             <JsKeyword>console</JsKeyword>.<JsKeyword>log</JsKeyword>(sum);{' '}
@@ -232,9 +362,15 @@ const JsArrayMethodsExercise1: React.FC = () => {
 
         <ConsoleOutput lines={console3Lines} />
 
-        <AnswerKey show={showAnswer3} onToggle={() => setShowAnswer3(!showAnswer3)}>
-          <pre dir="ltr" className="bg-gray-200 px-3 py-2 rounded font-mono text-sm">
-{`const big = nums.find(n => n > 20);       // 25
+        <AnswerKey
+          show={showAnswer3}
+          onToggle={() => setShowAnswer3(!showAnswer3)}
+        >
+          <pre
+            dir="ltr"
+            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
+          >
+            {`const big = nums.find(n => n > 20);       // 25
 const sum = nums.reduce((a, b) => a + b, 0); // 70`}
           </pre>
         </AnswerKey>
@@ -260,7 +396,8 @@ const sum = nums.reduce((a, b) => a + b, 0); // 70`}
             question: 'ماذا يُرجع [1,2,3].map(n => n + 10)؟',
             options: ['[1, 2, 3]', '[11, 12, 13]', '36', '[10, 20, 30]'],
             correctIndex: 1,
-            explanation: 'map تطبق الدالة على كل عنصر: 1+10=11, 2+10=12, 3+10=13.',
+            explanation:
+              'map تطبق الدالة على كل عنصر: 1+10=11, 2+10=12, 3+10=13.',
           },
           {
             question: 'ما الفرق بين find و filter؟',
@@ -271,7 +408,8 @@ const sum = nums.reduce((a, b) => a + b, 0); // 70`}
               'find تُرجع مصفوفة، filter تُرجع عنصر واحد',
             ],
             correctIndex: 1,
-            explanation: 'find تتوقف عند أول عنصر يحقق الشرط، بينما filter تمر على كل العناصر.',
+            explanation:
+              'find تتوقف عند أول عنصر يحقق الشرط، بينما filter تمر على كل العناصر.',
           },
           {
             question: 'ماذا يُرجع [5,10,15].reduce((a,b) => a + b, 0)؟',
@@ -281,9 +419,15 @@ const sum = nums.reduce((a, b) => a + b, 0); // 70`}
           },
           {
             question: 'هل map تغير المصفوفة الأصلية؟',
-            options: ['نعم', 'لا، تُرجع مصفوفة جديدة', 'أحياناً', 'فقط مع الأعداد'],
+            options: [
+              'نعم',
+              'لا، تُرجع مصفوفة جديدة',
+              'أحياناً',
+              'فقط مع الأعداد',
+            ],
             correctIndex: 1,
-            explanation: 'map, filter, find, reduce كلها لا تغير المصفوفة الأصلية.',
+            explanation:
+              'map, filter, find, reduce كلها لا تغير المصفوفة الأصلية.',
           },
         ]}
       />
