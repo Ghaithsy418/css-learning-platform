@@ -28,7 +28,13 @@ const FlexboxExercise1: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Flexbox 1: المحاذاة الأساسية">
+    <ExerciseSection
+      title="Flexbox 1: المحاذاة الأساسية"
+      lessonId="css-flexbox-1"
+      exerciseId="ex1"
+      maxPoints={15}
+      inputCount={3}
+    >
       <Explanation>
         <p>تحكم في المحاذاة الأفقية والعمودية للعناصر.</p>
       </Explanation>
@@ -41,6 +47,7 @@ const FlexboxExercise1: React.FC = () => {
             value={display}
             onChange={setDisplay}
             width="w-20"
+            correctValue="flex"
           />
           ; <Comment>/* تفعيل Flexbox */</Comment>
         </CodeLine>
@@ -50,6 +57,7 @@ const FlexboxExercise1: React.FC = () => {
             value={justifyContent}
             onChange={setJustifyContent}
             width="w-32"
+            correctValue="center"
           />
           ; <Comment>/* المحاذاة الأفقية */</Comment>
         </CodeLine>
@@ -59,6 +67,7 @@ const FlexboxExercise1: React.FC = () => {
             value={alignItems}
             onChange={setAlignItems}
             width="w-32"
+            correctValue="center"
           />
           ; <Comment>/* المحاذاة العمودية */</Comment>
         </CodeLine>

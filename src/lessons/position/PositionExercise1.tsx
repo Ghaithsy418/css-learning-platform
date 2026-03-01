@@ -44,7 +44,13 @@ const PositionExercise1: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Position 1: الموقع المطلق (Absolute)">
+    <ExerciseSection
+      title="Position 1: الموقع المطلق (Absolute)"
+      lessonId="css-position-1"
+      exerciseId="ex1"
+      maxPoints={15}
+      inputCount={3}
+    >
       <Explanation>
         <p>
           تسمح لك خاصية <code>position: absolute</code> بوضع العنصر في أي مكان
@@ -63,6 +69,7 @@ const PositionExercise1: React.FC = () => {
             value={position}
             onChange={setPosition}
             width="w-32"
+            correctValue="absolute"
           />
           ;
         </CodeLine>
@@ -72,6 +79,7 @@ const PositionExercise1: React.FC = () => {
             value={top}
             onChange={setTop}
             width="w-20"
+            correctValue="50px"
           />
           ;
         </CodeLine>
@@ -81,6 +89,7 @@ const PositionExercise1: React.FC = () => {
             value={left}
             onChange={setLeft}
             width="w-20"
+            correctValue="50px"
           />
           ;
         </CodeLine>

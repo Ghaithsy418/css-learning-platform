@@ -28,7 +28,13 @@ const FlexboxExercise2: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Flexbox 2: الاتجاه والالتفاف (Direction & Wrap)">
+    <ExerciseSection
+      title="Flexbox 2: الاتجاه والالتفاف (Direction & Wrap)"
+      lessonId="css-flexbox-2"
+      exerciseId="ex1"
+      maxPoints={10}
+      inputCount={2}
+    >
       <Explanation>
         <p>
           تحكم في اتجاه العناصر (صف أو عمود) وما إذا كانت يجب أن تلتف عندما لا
@@ -47,6 +53,7 @@ const FlexboxExercise2: React.FC = () => {
             value={direction}
             onChange={setDirection}
             width="w-32"
+            correctValue="column"
           />
           ; <Comment>/* row, column, row-reverse... */</Comment>
         </CodeLine>
@@ -56,6 +63,7 @@ const FlexboxExercise2: React.FC = () => {
             value={wrap}
             onChange={setWrap}
             width="w-32"
+            correctValue="wrap"
           />
           ; <Comment>/* nowrap, wrap */</Comment>
         </CodeLine>

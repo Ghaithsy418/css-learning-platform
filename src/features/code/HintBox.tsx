@@ -3,7 +3,7 @@
  * Hint/tip box component
  */
 
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 interface HintBoxProps {
   title?: string;
@@ -11,11 +11,11 @@ interface HintBoxProps {
 }
 
 export const HintBox: React.FC<HintBoxProps> = ({
-  title = "💡 نصائح:",
+  title = '💡 نصائح:',
   children,
 }) => {
   return (
-    <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 my-4 rounded leading-7">
+    <div className="bg-amber-50 border-r-4 border-amber-300 p-4 my-4 rounded-lg leading-7">
       <strong className="block mb-2">{title}</strong>
       {children}
     </div>

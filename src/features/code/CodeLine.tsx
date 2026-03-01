@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 
 interface CodeLineProps {
   indent?: number;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const CodeLine: React.FC<CodeLineProps> = ({ indent = 0, children }) => {

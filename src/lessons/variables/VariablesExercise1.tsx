@@ -1,12 +1,12 @@
 import { useState, type CSSProperties } from "react";
+import CodeEditor from "../../features/code/CodeEditor";
+import CodeInput from "../../features/code/CodeInput";
+import CodeLine from "../../features/code/CodeLine";
 import { ExerciseSection } from "../../features/code/ExerciseSection";
 import { Explanation } from "../../features/code/Explanation";
-import CodeEditor from "../../features/code/CodeEditor";
-import CodeLine from "../../features/code/CodeLine";
-import Property from "../../features/cssSyntax/Property";
-import CodeInput from "../../features/code/CodeInput";
-import { Comment } from "../../features/cssSyntax/Comments";
 import { HintBox } from "../../features/code/HintBox";
+import { Comment } from "../../features/cssSyntax/Comments";
+import Property from "../../features/cssSyntax/Property";
 
 const VariablesExercise1: React.FC = () => {
   // Variable definitions
@@ -249,7 +249,7 @@ const VariablesExercise1: React.FC = () => {
       </ExerciseSection>
 
       {/* Exercise */}
-      <ExerciseSection title="تمرين: استخدام المتغيرات">
+      <ExerciseSection title="تمرين: استخدام المتغيرات" lessonId="css-variables-1" exerciseId="ex1" maxPoints={10} inputCount={2}>
         <Explanation>
           <p>أكمل الكود التالي لاستخدام المتغيرات بدلاً من القيم المباشرة:</p>
         </Explanation>
@@ -271,6 +271,7 @@ const VariablesExercise1: React.FC = () => {
               value={userPrimaryVar}
               onChange={setUserPrimaryVar}
               width="w-48"
+              correctValue="var(--primary-color)"
             />
             ; <Comment>/* استخدم متغير اللون */</Comment>
           </CodeLine>
@@ -280,6 +281,7 @@ const VariablesExercise1: React.FC = () => {
               value={userSpacingVar}
               onChange={setUserSpacingVar}
               width="w-40"
+              correctValue="var(--spacing)"
             />
             ; <Comment>/* استخدم متغير المسافة */</Comment>
           </CodeLine>

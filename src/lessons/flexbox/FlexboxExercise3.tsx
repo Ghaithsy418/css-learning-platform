@@ -25,7 +25,13 @@ const FlexboxExercise3: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Flexbox 3: التمدد (Flex Grow)">
+    <ExerciseSection
+      title="Flexbox 3: التمدد (Flex Grow)"
+      lessonId="css-flexbox-3"
+      exerciseId="ex1"
+      maxPoints={10}
+      inputCount={2}
+    >
       <Explanation>
         <p>
           خاصية <code>flex-grow</code> تحدد مقدار المساحة التي سيأخذها العنصر من
@@ -47,6 +53,7 @@ const FlexboxExercise3: React.FC = () => {
             value={flexGrow2}
             onChange={setFlexGrow2}
             width="w-20"
+            correctValue="2"
           />
           ;
         </CodeLine>
@@ -59,6 +66,7 @@ const FlexboxExercise3: React.FC = () => {
             value={flexGrow3}
             onChange={setFlexGrow3}
             width="w-20"
+            correctValue="1"
           />
           ;
         </CodeLine>

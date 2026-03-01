@@ -11,6 +11,6 @@ interface ExplanationProps {
 
 export const Explanation: React.FC<ExplanationProps> = ({ children }) => {
   return (
-    <div className="bg-white p-4 rounded-lg mb-5 leading-7">{children}</div>
+    <div className="bg-white p-4 rounded-lg mb-5 leading-7 text-gray-700">{children}</div>
   );
 };

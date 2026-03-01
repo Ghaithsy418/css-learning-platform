@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "username": "asad",
+    "password": "Asad@2026",
+    "name": "أسعد",
+    "role": "student"
+  },
+  {
+    "id": 2,
+    "username": "ahmad",
+    "password": "Ahmad#Learn",
+    "name": "أحمد",
+    "role": "student"
+  },
+  {
+    "id": 3,
+    "username": "haneen",
+    "password": "Haneen!Study",
+    "name": "حنين",
+    "role": "student"
+  },
+  {
+    "id": 4,
+    "username": "islam",
+    "password": "Islam$Code",
+    "name": "إسلام",
+    "role": "student"
+  },
+  {
+    "id": 5,
+    "username": "ghofran",
+    "password": "Ghofran%Dev",
+    "name": "غفران",
+    "role": "student"
+  },
+  {
+    "id": 6,
+    "username": "admin",
+    "password": "Admin@Ctrl9",
+    "name": "المشرف",
+    "role": "admin"
+  }
+]

@@ -56,7 +56,13 @@ const PositionExercise2: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Position 2: Fixed vs Sticky">
+    <ExerciseSection
+      title="Position 2: Fixed vs Sticky"
+      lessonId="css-position-2"
+      exerciseId="ex1"
+      maxPoints={10}
+      inputCount={2}
+    >
       <Explanation>
         <p className="mb-4">
           يواجه الكثيرون صعوبة في التمييز بين <code>Fixed</code> و{' '}
@@ -85,6 +91,7 @@ const PositionExercise2: React.FC = () => {
             value={position}
             onChange={setPosition}
             width="w-32"
+            correctValue="sticky"
           />
           ;
         </CodeLine>
@@ -94,6 +101,7 @@ const PositionExercise2: React.FC = () => {
             value={top}
             onChange={setTop}
             width="w-20"
+            correctValue="0"
           />
           ;
         </CodeLine>

@@ -21,7 +21,13 @@ const ResponsiveExercise2: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Responsive 2: النصوص المرنة (clamp)">
+    <ExerciseSection
+      title="Responsive 2: النصوص المرنة (clamp)"
+      lessonId="css-responsive-2"
+      exerciseId="ex1"
+      maxPoints={5}
+      inputCount={1}
+    >
       <Explanation>
         <p>
           تسمح لك وظيفة <code>clamp()</code> بتحديد حجم خط يتغير بناءً على عرض
@@ -39,6 +45,7 @@ const ResponsiveExercise2: React.FC = () => {
             value={fontSize}
             onChange={setFontSize}
             width="w-64"
+            correctValue="clamp(1.5rem, 5vw, 3rem)"
           />
           ;
         </CodeLine>

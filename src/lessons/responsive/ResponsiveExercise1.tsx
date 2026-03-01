@@ -45,7 +45,13 @@ const ResponsiveExercise1: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Responsive 1: قواعد @media">
+    <ExerciseSection
+      title="Responsive 1: قواعد @media"
+      lessonId="css-responsive-1"
+      exerciseId="ex1"
+      maxPoints={15}
+      inputCount={3}
+    >
       <Explanation>
         <p>
           تسمح لك <code>@media</code> بتطبيق كود CSS فقط عندما تتحقق شروط معينة
@@ -62,6 +68,7 @@ const ResponsiveExercise1: React.FC = () => {
             value={baseBg}
             onChange={setBaseBg}
             width="w-24"
+            correctValue="white"
           />
           ;
         </CodeLine>
@@ -72,6 +79,7 @@ const ResponsiveExercise1: React.FC = () => {
             value={breakpoint}
             onChange={setBreakpoint}
             width="w-20"
+            correctValue="600px"
           />
           ) {'{'}
         </CodeLine>
@@ -82,6 +90,7 @@ const ResponsiveExercise1: React.FC = () => {
             value={mediaBg}
             onChange={setMediaBg}
             width="w-24"
+            correctValue="orange"
           />
           ;
         </CodeLine>

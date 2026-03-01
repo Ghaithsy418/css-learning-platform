@@ -50,7 +50,13 @@ const ResponsiveExercise3: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="Responsive 3: تغيير التخطيط (Layout Shift)">
+    <ExerciseSection
+      title="Responsive 3: تغيير التخطيط (Layout Shift)"
+      lessonId="css-responsive-3"
+      exerciseId="ex1"
+      maxPoints={5}
+      inputCount={1}
+    >
       <Explanation>
         <p>
           أحد أهم استخدامات <code>@media</code> هو تغيير اتجاه العناصر من أفقي
@@ -74,6 +80,7 @@ const ResponsiveExercise3: React.FC = () => {
             value={flexDir}
             onChange={setFlexDir}
             width="w-32"
+            correctValue="column"
           />
           ;
         </CodeLine>

@@ -26,7 +26,13 @@ const GridExercise1: React.FC = () => {
   };
 
   return (
-    <ExerciseSection title="التمرين الأول: إنشاء شبكتك الأولى">
+    <ExerciseSection
+      title="التمرين الأول: إنشاء شبكتك الأولى"
+      lessonId="css-grid-1"
+      exerciseId="ex1"
+      maxPoints={20}
+      inputCount={4}
+    >
       <Explanation>
         <p>
           لنقم بإنشاء شبكة بسيطة تحتوي على 3 أعمدة و صفين. املأ خصائص CSS أدناه
@@ -42,6 +48,7 @@ const GridExercise1: React.FC = () => {
             value={display}
             onChange={setDisplay}
             width="w-20"
+            correctValue="grid"
           />
           ; <Comment>/* اجعله شبكة */</Comment>
         </CodeLine>
@@ -51,6 +58,7 @@ const GridExercise1: React.FC = () => {
             value={columns}
             onChange={setColumns}
             width="w-40"
+            correctValue="1fr 1fr 1fr"
           />
           ; <Comment>/* 3 أعمدة متساوية */</Comment>
         </CodeLine>
@@ -60,6 +68,7 @@ const GridExercise1: React.FC = () => {
             value={rows}
             onChange={setRows}
             width="w-40"
+            correctValue="100px 100px"
           />
           ; <Comment>/* صفين */</Comment>
         </CodeLine>
@@ -69,6 +78,7 @@ const GridExercise1: React.FC = () => {
             value={gap}
             onChange={setGap}
             width="w-20"
+            correctValue="10px"
           />
           ; <Comment>/* المسافة بين العناصر */</Comment>
         </CodeLine>

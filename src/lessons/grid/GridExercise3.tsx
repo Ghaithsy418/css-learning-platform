@@ -1,51 +1,57 @@
-import { useState, type CSSProperties } from "react";
-import { ExerciseSection } from "../../features/code/ExerciseSection";
-import { Explanation } from "../../features/code/Explanation";
-import CodeEditor from "../../features/code/CodeEditor";
-import CodeLine from "../../features/code/CodeLine";
-import Property from "../../features/cssSyntax/Property";
-import Value from "../../features/cssSyntax/Value";
-import CodeInput from "../../features/code/CodeInput";
-import { Comment } from "../../features/cssSyntax/Comments";
-import { HintBox } from "../../features/code/HintBox";
-import { GridPreview } from "../../features/grid/GridPreview";
-import { GridItem } from "../../features/grid/GridItem";
-import { AnswerKey } from "../../features/code/AnswerKey";
+import { useState, type CSSProperties } from 'react';
+import { AnswerKey } from '../../features/code/AnswerKey';
+import CodeEditor from '../../features/code/CodeEditor';
+import CodeInput from '../../features/code/CodeInput';
+import CodeLine from '../../features/code/CodeLine';
+import { ExerciseSection } from '../../features/code/ExerciseSection';
+import { Explanation } from '../../features/code/Explanation';
+import { HintBox } from '../../features/code/HintBox';
+import { Comment } from '../../features/cssSyntax/Comments';
+import Property from '../../features/cssSyntax/Property';
+import Value from '../../features/cssSyntax/Value';
+import { GridItem } from '../../features/grid/GridItem';
+import { GridPreview } from '../../features/grid/GridPreview';
 
 const GridExercise3: React.FC = () => {
   // State for Item 1
-  const [colSpan1, setColSpan1] = useState<string>("");
-  const [rowSpan1, setRowSpan1] = useState<string>("");
+  const [colSpan1, setColSpan1] = useState<string>('');
+  const [rowSpan1, setRowSpan1] = useState<string>('');
 
   // State for the Last Item
-  const [colSpanLast, setColSpanLast] = useState<string>("");
+  const [colSpanLast, setColSpanLast] = useState<string>('');
 
   const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
   // Static styles for the container
   const containerStyles: CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gridTemplateRows: "repeat(3, 80px)",
-    gap: "10px",
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
+    gridTemplateRows: 'repeat(3, 80px)',
+    gap: '10px',
   };
 
   return (
-    <ExerciseSection title="التمرين الثالث: التمدد والتحكم في الخطوط (Spanning)">
+    <ExerciseSection
+      title="التمرين الثالث: التمدد والتحكم في الخطوط (Spanning)"
+      lessonId="css-grid-3"
+      exerciseId="ex1"
+      maxPoints={15}
+      inputCount={3}
+    >
       <Explanation>
         <p>
           بدلاً من مجرد وضع العناصر في خلايا فردية، يمكنك جعلها تمتد عبر عدة
           أعمدة أو صفوف باستخدام
           <code>grid-column</code> و <code>grid-row</code>.
           <br />
-          <strong>المهمة:</strong> لدينا شبكة 3×3. اجعل العنصر رقم{" "}
+          <strong>المهمة:</strong> لدينا شبكة 3×3. اجعل العنصر رقم{' '}
           <strong>1</strong> يغطي مربعاً بحجم 2×2 في الزاوية العلوية اليمنى،
           واجعل العنصر رقم <strong>6</strong> يمتد عبر الصف السفلي بالكامل.
         </p>
       </Explanation>
 
       <CodeEditor>
-        <CodeLine>.grid-container {"{"}</CodeLine>
+        <CodeLine>.grid-container {'{'}</CodeLine>
         <CodeLine indent={1}>
           <Property>display</Property>: <Value>grid</Value>;
         </CodeLine>
@@ -54,51 +60,62 @@ const GridExercise3: React.FC = () => {
           ;
         </CodeLine>
         <CodeLine indent={1}>
-          <Property>grid-template-rows</Property>:{" "}
+          <Property>grid-template-rows</Property>:{' '}
           <Value>repeat(3, 80px)</Value>;
         </CodeLine>
-        <CodeLine>{"}"}</CodeLine>
+        <CodeLine>{'}'}</CodeLine>
 
         <CodeLine>&nbsp;</CodeLine>
 
-        <CodeLine>.item-1 {"{"}</CodeLine>
+        <CodeLine>.item-1 {'{'}</CodeLine>
         <CodeLine indent={1}>
           <Property>background</Property>: <Value>#purple</Value>;
         </CodeLine>
         <CodeLine indent={1}>
-          <Property>grid-column</Property>:{" "}
-          <CodeInput value={colSpan1} onChange={setColSpan1} width="w-32" />;{" "}
-          <Comment>/* تمدد عمودين */</Comment>
+          <Property>grid-column</Property>:{' '}
+          <CodeInput
+            value={colSpan1}
+            onChange={setColSpan1}
+            width="w-32"
+            correctValue="span 2"
+          />
+          ; <Comment>/* تمدد عمودين */</Comment>
         </CodeLine>
         <CodeLine indent={1}>
-          <Property>grid-row</Property>:{" "}
-          <CodeInput value={rowSpan1} onChange={setRowSpan1} width="w-32" />;{" "}
-          <Comment>/* تمدد صفين */</Comment>
+          <Property>grid-row</Property>:{' '}
+          <CodeInput
+            value={rowSpan1}
+            onChange={setRowSpan1}
+            width="w-32"
+            correctValue="span 2"
+          />
+          ; <Comment>/* تمدد صفين */</Comment>
         </CodeLine>
-        <CodeLine>{"}"}</CodeLine>
+        <CodeLine>{'}'}</CodeLine>
 
         <CodeLine>&nbsp;</CodeLine>
 
-        <CodeLine>.item-6 {"{"}</CodeLine>
+        <CodeLine>.item-6 {'{'}</CodeLine>
         <CodeLine indent={1}>
           <Property>background</Property>: <Value>#pink</Value>;
         </CodeLine>
         <CodeLine indent={1}>
-          <Property>grid-column</Property>:{" "}
+          <Property>grid-column</Property>:{' '}
           <CodeInput
             value={colSpanLast}
             onChange={setColSpanLast}
             width="w-32"
+            correctValue="1 / -1"
           />
           ; <Comment>/* كامل العرض */</Comment>
         </CodeLine>
-        <CodeLine>{"}"}</CodeLine>
+        <CodeLine>{'}'}</CodeLine>
       </CodeEditor>
 
       <HintBox>
         <ul className="mr-5 leading-7">
           <li>
-            استخدم الكلمة المفتاحية <strong>span</strong>. مثال:{" "}
+            استخدم الكلمة المفتاحية <strong>span</strong>. مثال:{' '}
             <Value>span 2</Value>.
           </li>
           <li>
@@ -113,13 +130,16 @@ const GridExercise3: React.FC = () => {
         </ul>
       </HintBox>
 
-      <GridPreview gridStyles={containerStyles} label="👇 تحدي التمدد:">
+      <GridPreview
+        gridStyles={containerStyles}
+        label="👇 تحدي التمدد:"
+      >
         {/* Item 1: The Giant Box */}
         <GridItem
           style={{
             gridColumn: colSpan1,
             gridRow: rowSpan1,
-            background: "#7c3aed", // darker purple
+            background: '#7c3aed', // darker purple
             zIndex: 10,
           }}
         >
@@ -136,25 +156,28 @@ const GridExercise3: React.FC = () => {
         <GridItem
           style={{
             gridColumn: colSpanLast,
-            background: "#ec4899", // pink
+            background: '#ec4899', // pink
           }}
         >
           6
         </GridItem>
       </GridPreview>
 
-      <AnswerKey show={showAnswer} onToggle={() => setShowAnswer(!showAnswer)}>
+      <AnswerKey
+        show={showAnswer}
+        onToggle={() => setShowAnswer(!showAnswer)}
+      >
         <p className="font-bold mb-2 text-purple-600">.item-1</p>
         <p>
           <code className="bg-gray-200 px-2 py-1 rounded font-mono">
             grid-column: <strong>span 2</strong>
-          </code>{" "}
+          </code>{' '}
           أو <strong>1 / 3</strong>
         </p>
         <p>
           <code className="bg-gray-200 px-2 py-1 rounded font-mono">
             grid-row: <strong>span 2</strong>
-          </code>{" "}
+          </code>{' '}
           أو <strong>1 / 3</strong>
         </p>
 
@@ -162,7 +185,7 @@ const GridExercise3: React.FC = () => {
         <p>
           <code className="bg-gray-200 px-2 py-1 rounded font-mono">
             grid-column: <strong>1 / -1</strong>
-          </code>{" "}
+          </code>{' '}
           أو <strong>span 3</strong>
         </p>
       </AnswerKey>
