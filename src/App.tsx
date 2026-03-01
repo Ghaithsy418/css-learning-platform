@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { lazy, Suspense, useState } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
+import { Component, lazy, Suspense, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import {
   BrowserRouter,
@@ -43,34 +44,93 @@ import UnitsExercise1 from './lessons/units/UnitsExercise1';
 import VariablesExercise1 from './lessons/variables/VariablesExercise1';
 import HomePage from './pages/HomePage';
 
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+/* ── Retry wrapper for lazy imports (handles stale chunk errors after redeployment) ── */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyRetry<T extends { default: React.ComponentType<any> }>(
+  importFn: () => Promise<T>,
+): React.LazyExoticComponent<T['default']> {
+  return lazy(() =>
+    importFn().catch(() => {
+      // If the chunk fetch fails (e.g. after a new deploy), hard-reload once
+      const key = 'chunk-reload';
+      const hasReloaded = sessionStorage.getItem(key);
+      if (!hasReloaded) {
+        sessionStorage.setItem(key, '1');
+        window.location.reload();
+        // Return a never-resolving promise so React doesn't render before reload
+        return new Promise<T>(() => {});
+      }
+      sessionStorage.removeItem(key);
+      // If we already reloaded once and it still fails, surface the error
+      return importFn();
+    }),
+  );
+}
+
+/* ── Error Boundary for chunk load failures ── */
+class ChunkErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(_: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('ChunkErrorBoundary caught:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-white">
+          <p className="text-lg">A new version is available.</p>
+          <button
+            onClick={() => {
+              sessionStorage.removeItem('chunk-reload');
+              window.location.reload();
+            }}
+            className="px-6 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500 transition"
+          >
+            Reload page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AdminDashboard = lazyRetry(() => import('./pages/AdminDashboard'));
 
 /* ── Lazy-loaded JS lessons ── */
-const JsOperatorsExercise1 = lazy(
+const JsOperatorsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsOperatorsExercise1'),
 );
-const JsConditionalsExercise1 = lazy(
+const JsConditionalsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsConditionalsExercise1'),
 );
-const JsLoopsExercise1 = lazy(
+const JsLoopsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsLoopsExercise1'),
 );
-const JsArraysExercise1 = lazy(
+const JsArraysExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsArraysExercise1'),
 );
-const JsObjectsExercise1 = lazy(
+const JsObjectsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsObjectsExercise1'),
 );
-const JsEventsExercise1 = lazy(
+const JsEventsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsEventsExercise1'),
 );
-const JsStringsExercise1 = lazy(
+const JsStringsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsStringsExercise1'),
 );
-const JsArrayMethodsExercise1 = lazy(
+const JsArrayMethodsExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsArrayMethodsExercise1'),
 );
-const JsDebuggingExercise1 = lazy(
+const JsDebuggingExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsDebuggingExercise1'),
 );
 
@@ -643,239 +703,551 @@ function App() {
       <ProgressProvider>
         <LessonLockProvider>
           <BrowserRouter>
-            <Toaster position="top-center" />
-            <Routes>
-              {/* ── Login ── */}
-              <Route
-                path="/login"
-                element={<LoginPage />}
-              />
-
-              {/* ── Home Page (path chooser) — public ── */}
-              <Route
-                path="/"
-                element={<HomePage />}
-              />
-
-              {/* ── Admin Dashboard ── */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <Suspense fallback={<LazyFallback />}>
-                      <AdminDashboard />
-                    </Suspense>
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* ═══ CSS Track ═══ */}
-              <Route
-                path="/css"
-                element={
-                  <ProtectedRoute>
-                    <TrackGuard track="css">
-                      <LessonLayout track="css" />
-                    </TrackGuard>
-                  </ProtectedRoute>
-                }
-              >
+            <ChunkErrorBoundary>
+              <Toaster position="top-center" />
+              <Routes>
+                {/* ── Login ── */}
                 <Route
-                  index
-                  element={<SmartIndexRedirect track="css" />}
+                  path="/login"
+                  element={<LoginPage />}
                 />
 
-                {/* Grid */}
+                {/* ── Home Page (path chooser) — public ── */}
                 <Route
-                  path="grid/1"
-                  element={
-                    <LessonGuard lessonId="grid-1">
-                      <LessonHeader
-                        title="دليل CSS Grid التفاعلي"
-                        description="اكتب إجاباتك مباشرة في الكود وشاهد الشبكة تتحدث!"
-                        color="purple"
-                      />
-                      <GridExercise1 />
-                    </LessonGuard>
-                  }
+                  path="/"
+                  element={<HomePage />}
                 />
+
+                {/* ── Admin Dashboard ── */}
                 <Route
-                  path="grid/2"
+                  path="/admin"
                   element={
-                    <LessonGuard lessonId="grid-2">
-                      <LessonHeader
-                        title="أحجام أعمدة متقدمة"
-                        description="استخدم fr و px و auto معًا."
-                        color="purple"
-                      />
-                      <GridExercise2 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="grid/3"
-                  element={
-                    <LessonGuard lessonId="grid-3">
-                      <LessonHeader
-                        title="Grid Spanning"
-                        description="تمدد عبر الأعمدة والصفوف (span)."
-                        color="purple"
-                      />
-                      <GridExercise3 />
-                    </LessonGuard>
+                    <ProtectedRoute>
+                      <Suspense fallback={<LazyFallback />}>
+                        <AdminDashboard />
+                      </Suspense>
+                    </ProtectedRoute>
                   }
                 />
 
-                {/* Flexbox */}
+                {/* ═══ CSS Track ═══ */}
                 <Route
-                  path="flexbox/1"
+                  path="/css"
                   element={
-                    <LessonGuard lessonId="flex-1">
-                      <LessonHeader
-                        title="تعلم Flexbox: المحاذاة"
-                        description="تحكم في محاذاة وتوزيع العناصر بمرونة."
-                        color="blue"
-                      />
-                      <FlexboxExercise1 />
-                    </LessonGuard>
+                    <ProtectedRoute>
+                      <TrackGuard track="css">
+                        <LessonLayout track="css" />
+                      </TrackGuard>
+                    </ProtectedRoute>
                   }
-                />
-                <Route
-                  path="flexbox/2"
-                  element={
-                    <LessonGuard lessonId="flex-2">
-                      <LessonHeader
-                        title="Flexbox: الاتجاه والالتفاف"
-                        description="بناء تخطيطات مرنة ومتجاوبة."
-                        color="blue"
-                      />
-                      <FlexboxExercise2 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="flexbox/3"
-                  element={
-                    <LessonGuard lessonId="flex-3">
-                      <LessonHeader
-                        title="Flexbox: التمدد (Grow)"
-                        description="كيف تملأ العناصر المساحة المتبقية."
-                        color="blue"
-                      />
-                      <FlexboxExercise3 />
-                    </LessonGuard>
-                  }
-                />
+                >
+                  <Route
+                    index
+                    element={<SmartIndexRedirect track="css" />}
+                  />
 
-                {/* Advanced CSS */}
-                <Route
-                  path="shadows/1"
-                  element={
-                    <LessonGuard lessonId="shadow-1">
-                      <LessonHeader
-                        title="الظلال في CSS"
-                        description="تعلم استخدام box-shadow و text-shadow لإضافة عمق لتصميماتك."
-                        color="purple"
-                      />
-                      <ShadowExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="units/1"
-                  element={
-                    <LessonGuard lessonId="units-1">
-                      <LessonHeader
-                        title="الوحدات في CSS"
-                        description="الفرق بين px و rem و em ومتى تستخدم كل منها."
-                        color="purple"
-                      />
-                      <UnitsExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="variables/1"
-                  element={
-                    <LessonGuard lessonId="vars-1">
-                      <LessonHeader
-                        title="المتغيرات في CSS"
-                        description="تعلم استخدام CSS Variables وأفضل الممارسات."
-                        color="purple"
-                      />
-                      <VariablesExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="responsive/1"
-                  element={
-                    <LessonGuard lessonId="resp-1">
-                      <LessonHeader
-                        title="التصميم المتجاوب"
-                        description="كيف تجعل تصميمك يعمل على كل الشاشات."
-                        color="purple"
-                      />
-                      <ResponsiveExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="responsive/2"
-                  element={
-                    <LessonGuard lessonId="resp-2">
-                      <LessonHeader
-                        title="Responsive: نصوص مرنة"
-                        description="استخدام clamp لتغيير أحجام الخطوط بذكاء."
-                        color="purple"
-                      />
-                      <ResponsiveExercise2 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="responsive/3"
-                  element={
-                    <LessonGuard lessonId="resp-3">
-                      <LessonHeader
-                        title="تغيير التخطيط المتجاوب"
-                        description="كيفية تحويل الصفوف إلى أعمدة في الشاشات الصغيرة."
-                        color="purple"
-                      />
-                      <ResponsiveExercise3 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="position/1"
-                  element={
-                    <LessonGuard lessonId="pos-1">
-                      <LessonHeader
-                        title="خاصية Position"
-                        description="تحريك العناصر بدقة في الصفحة."
-                        color="purple"
-                      />
-                      <PositionExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="position/2"
-                  element={
-                    <LessonGuard lessonId="pos-2">
-                      <LessonHeader
-                        title="Position: التثبيت (Sticky)"
-                        description="كيفية تثبيت العناصر عند التمرير."
-                        color="purple"
-                      />
-                      <PositionExercise2 />
-                    </LessonGuard>
-                  }
-                />
+                  {/* Grid */}
+                  <Route
+                    path="grid/1"
+                    element={
+                      <LessonGuard lessonId="grid-1">
+                        <LessonHeader
+                          title="دليل CSS Grid التفاعلي"
+                          description="اكتب إجاباتك مباشرة في الكود وشاهد الشبكة تتحدث!"
+                          color="purple"
+                        />
+                        <GridExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="grid/2"
+                    element={
+                      <LessonGuard lessonId="grid-2">
+                        <LessonHeader
+                          title="أحجام أعمدة متقدمة"
+                          description="استخدم fr و px و auto معًا."
+                          color="purple"
+                        />
+                        <GridExercise2 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="grid/3"
+                    element={
+                      <LessonGuard lessonId="grid-3">
+                        <LessonHeader
+                          title="Grid Spanning"
+                          description="تمدد عبر الأعمدة والصفوف (span)."
+                          color="purple"
+                        />
+                        <GridExercise3 />
+                      </LessonGuard>
+                    }
+                  />
 
-                {/* References */}
+                  {/* Flexbox */}
+                  <Route
+                    path="flexbox/1"
+                    element={
+                      <LessonGuard lessonId="flex-1">
+                        <LessonHeader
+                          title="تعلم Flexbox: المحاذاة"
+                          description="تحكم في محاذاة وتوزيع العناصر بمرونة."
+                          color="blue"
+                        />
+                        <FlexboxExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="flexbox/2"
+                    element={
+                      <LessonGuard lessonId="flex-2">
+                        <LessonHeader
+                          title="Flexbox: الاتجاه والالتفاف"
+                          description="بناء تخطيطات مرنة ومتجاوبة."
+                          color="blue"
+                        />
+                        <FlexboxExercise2 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="flexbox/3"
+                    element={
+                      <LessonGuard lessonId="flex-3">
+                        <LessonHeader
+                          title="Flexbox: التمدد (Grow)"
+                          description="كيف تملأ العناصر المساحة المتبقية."
+                          color="blue"
+                        />
+                        <FlexboxExercise3 />
+                      </LessonGuard>
+                    }
+                  />
+
+                  {/* Advanced CSS */}
+                  <Route
+                    path="shadows/1"
+                    element={
+                      <LessonGuard lessonId="shadow-1">
+                        <LessonHeader
+                          title="الظلال في CSS"
+                          description="تعلم استخدام box-shadow و text-shadow لإضافة عمق لتصميماتك."
+                          color="purple"
+                        />
+                        <ShadowExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="units/1"
+                    element={
+                      <LessonGuard lessonId="units-1">
+                        <LessonHeader
+                          title="الوحدات في CSS"
+                          description="الفرق بين px و rem و em ومتى تستخدم كل منها."
+                          color="purple"
+                        />
+                        <UnitsExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="variables/1"
+                    element={
+                      <LessonGuard lessonId="vars-1">
+                        <LessonHeader
+                          title="المتغيرات في CSS"
+                          description="تعلم استخدام CSS Variables وأفضل الممارسات."
+                          color="purple"
+                        />
+                        <VariablesExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="responsive/1"
+                    element={
+                      <LessonGuard lessonId="resp-1">
+                        <LessonHeader
+                          title="التصميم المتجاوب"
+                          description="كيف تجعل تصميمك يعمل على كل الشاشات."
+                          color="purple"
+                        />
+                        <ResponsiveExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="responsive/2"
+                    element={
+                      <LessonGuard lessonId="resp-2">
+                        <LessonHeader
+                          title="Responsive: نصوص مرنة"
+                          description="استخدام clamp لتغيير أحجام الخطوط بذكاء."
+                          color="purple"
+                        />
+                        <ResponsiveExercise2 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="responsive/3"
+                    element={
+                      <LessonGuard lessonId="resp-3">
+                        <LessonHeader
+                          title="تغيير التخطيط المتجاوب"
+                          description="كيفية تحويل الصفوف إلى أعمدة في الشاشات الصغيرة."
+                          color="purple"
+                        />
+                        <ResponsiveExercise3 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="position/1"
+                    element={
+                      <LessonGuard lessonId="pos-1">
+                        <LessonHeader
+                          title="خاصية Position"
+                          description="تحريك العناصر بدقة في الصفحة."
+                          color="purple"
+                        />
+                        <PositionExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="position/2"
+                    element={
+                      <LessonGuard lessonId="pos-2">
+                        <LessonHeader
+                          title="Position: التثبيت (Sticky)"
+                          description="كيفية تثبيت العناصر عند التمرير."
+                          color="purple"
+                        />
+                        <PositionExercise2 />
+                      </LessonGuard>
+                    }
+                  />
+
+                  {/* References */}
+                  <Route
+                    path="reference"
+                    element={
+                      <Navigate
+                        to="/css/reference/grid"
+                        replace
+                      />
+                    }
+                  />
+                  <Route
+                    path="reference/grid"
+                    element={<QuickReference />}
+                  />
+                  <Route
+                    path="reference/flexbox"
+                    element={<FlexboxReference />}
+                  />
+                </Route>
+
+                {/* ═══ JavaScript Track ═══ */}
                 <Route
-                  path="reference"
+                  path="/js"
+                  element={
+                    <ProtectedRoute>
+                      <TrackGuard track="js">
+                        <LessonLayout track="js" />
+                      </TrackGuard>
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route
+                    index
+                    element={<SmartIndexRedirect track="js" />}
+                  />
+
+                  {/* الأساسيات */}
+                  <Route
+                    path="1"
+                    element={
+                      <LessonGuard lessonId="js-1">
+                        <LessonHeader
+                          title="المتغيرات وأنواع البيانات"
+                          description="تعلم let و const وأنواع البيانات في JavaScript."
+                          color="amber"
+                        />
+                        <JsVariablesExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="2"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-2">
+                          <LessonHeader
+                            title="العمليات والمعاملات"
+                            description="العمليات الحسابية والمنطقية والمقارنة."
+                            color="amber"
+                          />
+                          <JsOperatorsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="3"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-3">
+                          <LessonHeader
+                            title="الجمل الشرطية"
+                            description="if / else / else if وعامل التشغيل الشرطي."
+                            color="amber"
+                          />
+                          <JsConditionalsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="4"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-4">
+                          <LessonHeader
+                            title="الحلقات التكرارية"
+                            description="for و while و do-while للتكرار."
+                            color="amber"
+                          />
+                          <JsLoopsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+
+                  {/* البناء */}
+                  <Route
+                    path="5"
+                    element={
+                      <LessonGuard lessonId="js-5">
+                        <LessonHeader
+                          title="الدوال (Functions)"
+                          description="من الدوال العادية إلى السهمية و Callbacks."
+                          color="amber"
+                        />
+                        <JsFunctionsExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="6"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-6">
+                          <LessonHeader
+                            title="المصفوفات (Arrays)"
+                            description="إنشاء المصفوفات والوصول للعناصر والتعديل عليها."
+                            color="amber"
+                          />
+                          <JsArraysExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="7"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-7">
+                          <LessonHeader
+                            title="الكائنات (Objects)"
+                            description="إنشاء الكائنات والوصول للخصائص والتعامل معها."
+                            color="amber"
+                          />
+                          <JsObjectsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+
+                  {/* التفاعل */}
+                  <Route
+                    path="8"
+                    element={
+                      <LessonGuard lessonId="js-8">
+                        <LessonHeader
+                          title="DOM والعناصر"
+                          description="تلاعب بعناصر الصفحة وأضف تفاعلية بالأحداث."
+                          color="amber"
+                        />
+                        <JsDomExercise1 />
+                      </LessonGuard>
+                    }
+                  />
+                  <Route
+                    path="9"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-9">
+                          <LessonHeader
+                            title="الأحداث (Events)"
+                            description="addEventListener وأنواع الأحداث المختلفة."
+                            color="amber"
+                          />
+                          <JsEventsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+
+                  {/* المتقدم */}
+                  <Route
+                    path="10"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-10">
+                          <LessonHeader
+                            title="النصوص (Strings)"
+                            description="دوال النصوص والبحث والاستبدال والتقسيم."
+                            color="amber"
+                          />
+                          <JsStringsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="11"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-11">
+                          <LessonHeader
+                            title="دوال المصفوفات"
+                            description="map و filter و reduce و find وأكثر."
+                            color="amber"
+                          />
+                          <JsArrayMethodsExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="12"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonGuard lessonId="js-12">
+                          <LessonHeader
+                            title="تصحيح الأخطاء"
+                            description="أنواع الأخطاء وكيفية قراءتها وإصلاحها."
+                            color="amber"
+                          />
+                          <JsDebuggingExercise1 />
+                        </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+
+                  {/* Legacy routes */}
+                  <Route
+                    path="variables/1"
+                    element={
+                      <Navigate
+                        to="/js/1"
+                        replace
+                      />
+                    }
+                  />
+                  <Route
+                    path="functions/1"
+                    element={
+                      <Navigate
+                        to="/js/5"
+                        replace
+                      />
+                    }
+                  />
+                  <Route
+                    path="dom/1"
+                    element={
+                      <Navigate
+                        to="/js/8"
+                        replace
+                      />
+                    }
+                  />
+                </Route>
+
+                {/* ── Legacy redirect: old routes without /css prefix ── */}
+                <Route
+                  path="/grid/*"
+                  element={
+                    <Navigate
+                      to="/css/grid/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/flexbox/*"
+                  element={
+                    <Navigate
+                      to="/css/flexbox/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/shadows/*"
+                  element={
+                    <Navigate
+                      to="/css/shadows/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/units/*"
+                  element={
+                    <Navigate
+                      to="/css/units/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/variables/*"
+                  element={
+                    <Navigate
+                      to="/css/variables/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/responsive/*"
+                  element={
+                    <Navigate
+                      to="/css/responsive/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/position/*"
+                  element={
+                    <Navigate
+                      to="/css/position/1"
+                      replace
+                    />
+                  }
+                />
+                <Route
+                  path="/reference/*"
                   element={
                     <Navigate
                       to="/css/reference/grid"
@@ -883,318 +1255,8 @@ function App() {
                     />
                   }
                 />
-                <Route
-                  path="reference/grid"
-                  element={<QuickReference />}
-                />
-                <Route
-                  path="reference/flexbox"
-                  element={<FlexboxReference />}
-                />
-              </Route>
-
-              {/* ═══ JavaScript Track ═══ */}
-              <Route
-                path="/js"
-                element={
-                  <ProtectedRoute>
-                    <TrackGuard track="js">
-                      <LessonLayout track="js" />
-                    </TrackGuard>
-                  </ProtectedRoute>
-                }
-              >
-                <Route
-                  index
-                  element={<SmartIndexRedirect track="js" />}
-                />
-
-                {/* الأساسيات */}
-                <Route
-                  path="1"
-                  element={
-                    <LessonGuard lessonId="js-1">
-                      <LessonHeader
-                        title="المتغيرات وأنواع البيانات"
-                        description="تعلم let و const وأنواع البيانات في JavaScript."
-                        color="amber"
-                      />
-                      <JsVariablesExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="2"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-2">
-                        <LessonHeader
-                          title="العمليات والمعاملات"
-                          description="العمليات الحسابية والمنطقية والمقارنة."
-                          color="amber"
-                        />
-                        <JsOperatorsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="3"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-3">
-                        <LessonHeader
-                          title="الجمل الشرطية"
-                          description="if / else / else if وعامل التشغيل الشرطي."
-                          color="amber"
-                        />
-                        <JsConditionalsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="4"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-4">
-                        <LessonHeader
-                          title="الحلقات التكرارية"
-                          description="for و while و do-while للتكرار."
-                          color="amber"
-                        />
-                        <JsLoopsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-
-                {/* البناء */}
-                <Route
-                  path="5"
-                  element={
-                    <LessonGuard lessonId="js-5">
-                      <LessonHeader
-                        title="الدوال (Functions)"
-                        description="من الدوال العادية إلى السهمية و Callbacks."
-                        color="amber"
-                      />
-                      <JsFunctionsExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="6"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-6">
-                        <LessonHeader
-                          title="المصفوفات (Arrays)"
-                          description="إنشاء المصفوفات والوصول للعناصر والتعديل عليها."
-                          color="amber"
-                        />
-                        <JsArraysExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="7"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-7">
-                        <LessonHeader
-                          title="الكائنات (Objects)"
-                          description="إنشاء الكائنات والوصول للخصائص والتعامل معها."
-                          color="amber"
-                        />
-                        <JsObjectsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-
-                {/* التفاعل */}
-                <Route
-                  path="8"
-                  element={
-                    <LessonGuard lessonId="js-8">
-                      <LessonHeader
-                        title="DOM والعناصر"
-                        description="تلاعب بعناصر الصفحة وأضف تفاعلية بالأحداث."
-                        color="amber"
-                      />
-                      <JsDomExercise1 />
-                    </LessonGuard>
-                  }
-                />
-                <Route
-                  path="9"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-9">
-                        <LessonHeader
-                          title="الأحداث (Events)"
-                          description="addEventListener وأنواع الأحداث المختلفة."
-                          color="amber"
-                        />
-                        <JsEventsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-
-                {/* المتقدم */}
-                <Route
-                  path="10"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-10">
-                        <LessonHeader
-                          title="النصوص (Strings)"
-                          description="دوال النصوص والبحث والاستبدال والتقسيم."
-                          color="amber"
-                        />
-                        <JsStringsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="11"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-11">
-                        <LessonHeader
-                          title="دوال المصفوفات"
-                          description="map و filter و reduce و find وأكثر."
-                          color="amber"
-                        />
-                        <JsArrayMethodsExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="12"
-                  element={
-                    <Suspense fallback={<LazyFallback />}>
-                      <LessonGuard lessonId="js-12">
-                        <LessonHeader
-                          title="تصحيح الأخطاء"
-                          description="أنواع الأخطاء وكيفية قراءتها وإصلاحها."
-                          color="amber"
-                        />
-                        <JsDebuggingExercise1 />
-                      </LessonGuard>
-                    </Suspense>
-                  }
-                />
-
-                {/* Legacy routes */}
-                <Route
-                  path="variables/1"
-                  element={
-                    <Navigate
-                      to="/js/1"
-                      replace
-                    />
-                  }
-                />
-                <Route
-                  path="functions/1"
-                  element={
-                    <Navigate
-                      to="/js/5"
-                      replace
-                    />
-                  }
-                />
-                <Route
-                  path="dom/1"
-                  element={
-                    <Navigate
-                      to="/js/8"
-                      replace
-                    />
-                  }
-                />
-              </Route>
-
-              {/* ── Legacy redirect: old routes without /css prefix ── */}
-              <Route
-                path="/grid/*"
-                element={
-                  <Navigate
-                    to="/css/grid/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/flexbox/*"
-                element={
-                  <Navigate
-                    to="/css/flexbox/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/shadows/*"
-                element={
-                  <Navigate
-                    to="/css/shadows/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/units/*"
-                element={
-                  <Navigate
-                    to="/css/units/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/variables/*"
-                element={
-                  <Navigate
-                    to="/css/variables/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/responsive/*"
-                element={
-                  <Navigate
-                    to="/css/responsive/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/position/*"
-                element={
-                  <Navigate
-                    to="/css/position/1"
-                    replace
-                  />
-                }
-              />
-              <Route
-                path="/reference/*"
-                element={
-                  <Navigate
-                    to="/css/reference/grid"
-                    replace
-                  />
-                }
-              />
-            </Routes>
+              </Routes>
+            </ChunkErrorBoundary>
           </BrowserRouter>
         </LessonLockProvider>
       </ProgressProvider>
