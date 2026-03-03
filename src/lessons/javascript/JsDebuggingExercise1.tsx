@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 12 — تصحيح الأخطاء (Debugging)
@@ -561,47 +561,10 @@ name.toUpperCase()`}
       </div>
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-12"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما نوع الخطأ عند كتابة console.log("hi" بدون قوس إغلاق؟',
-            options: [
-              'TypeError',
-              'ReferenceError',
-              'SyntaxError',
-              'LogicError',
-            ],
-            correctIndex: 2,
-            explanation:
-              'SyntaxError يحدث عند وجود أخطاء في كتابة الكود مثل أقواس ناقصة.',
-          },
-          {
-            question: 'ماذا يحدث للكود بعد try/catch إذا حدث خطأ في try؟',
-            options: [
-              'يتوقف البرنامج',
-              'ينتقل لـ catch ثم يكمل',
-              'يتجاهل الخطأ',
-              'يعيد تشغيل try',
-            ],
-            correctIndex: 1,
-            explanation:
-              'catch يلتقط الخطأ ويتعامل معه، ثم يستمر البرنامج بشكل طبيعي.',
-          },
-          {
-            question: 'ما الفرق بين = و === ؟',
-            options: [
-              'لا فرق',
-              '= مقارنة و === تعيين',
-              '= تعيين و === مقارنة صارمة',
-              'كلاهما مقارنة',
-            ],
-            correctIndex: 2,
-            explanation:
-              '= لتعيين القيم (x = 5)، === للمقارنة الصارمة (x === 5).',
-          },
-        ]}
+        lessonNum="12"
+        totalQuestions={8}
       />
     </>
   );

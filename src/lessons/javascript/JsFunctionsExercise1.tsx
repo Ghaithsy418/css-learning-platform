@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsFunction from '../../features/jsSyntax/JsFunction';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    JS Exercise 2 — الدوال (Functions)
@@ -509,37 +509,10 @@ const JsFunctionsExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-5"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ماذا تُرجع الدالة التي لا تحتوي على return؟',
-            options: ['null', 'undefined', '0', 'false'],
-            correctIndex: 1,
-            explanation:
-              'الدوال التي لا تحتوي return تُرجع undefined تلقائياً.',
-          },
-          {
-            question: 'ما الفرق بين function و arrow function؟',
-            options: [
-              'لا فرق',
-              'Arrow function أسرع',
-              'Arrow function لا تملك this خاص بها',
-              'function لا تقبل معاملات',
-            ],
-            correctIndex: 2,
-            explanation:
-              'الدوال السهمية ترث this من النطاق الخارجي بدلاً من إنشاء نطاق خاص.',
-          },
-          {
-            question:
-              'ماذا يطبع هذا الكود؟ const add = (a, b) => a + b; console.log(add(3, 7));',
-            options: ['37', '10', 'undefined', 'خطأ'],
-            correctIndex: 1,
-            explanation: 'الدالة تجمع 3 + 7 = 10 وتُرجعها.',
-          },
-        ]}
+        lessonNum="5"
+        totalQuestions={8}
       />
     </>
   );

@@ -10,7 +10,7 @@ import { HintBox } from '../../features/code/HintBox';
 import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 2 — العمليات والمعاملات (Operators)
@@ -568,41 +568,10 @@ const JsOperatorsExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-2"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما نتيجة 10 % 3 ؟',
-            options: ['3', '1', '3.33', '0'],
-            correctIndex: 1,
-            explanation: '% تُرجع باقي القسمة: 10 ÷ 3 = 3 والباقي 1.',
-          },
-          {
-            question: 'ما الفرق بين == و === ؟',
-            options: [
-              'لا فرق',
-              '=== تقارن القيمة فقط',
-              '=== تقارن القيمة والنوع معاً',
-              '== أحدث من ===',
-            ],
-            correctIndex: 2,
-            explanation:
-              '=== (strict equality) تتحقق من تطابق القيمة والنوع معاً.',
-          },
-          {
-            question: 'ما نتيجة true && false ؟',
-            options: ['true', 'false', 'undefined', 'null'],
-            correctIndex: 1,
-            explanation: '&& تُرجع true فقط إذا كان كلا الطرفين true.',
-          },
-          {
-            question: 'ما نتيجة 2 ** 4 ؟',
-            options: ['8', '6', '16', '24'],
-            correctIndex: 2,
-            explanation: '** عملية الأس: 2⁴ = 16.',
-          },
-        ]}
+        lessonNum="2"
+        totalQuestions={8}
       />
     </>
   );

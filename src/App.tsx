@@ -133,6 +133,7 @@ const JsArrayMethodsExercise1 = lazyRetry(
 const JsDebuggingExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsDebuggingExercise1'),
 );
+const QuizPage = lazyRetry(() => import('./features/quiz/QuizPage'));
 
 /* ── Loader for lazy components ── */
 const LazyFallback = () => (
@@ -1148,6 +1149,16 @@ function App() {
                           />
                           <JsDebuggingExercise1 />
                         </LessonGuard>
+                      </Suspense>
+                    }
+                  />
+
+                  {/* Quiz pages */}
+                  <Route
+                    path=":lessonNum/quiz"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <QuizPage />
                       </Suspense>
                     }
                   />

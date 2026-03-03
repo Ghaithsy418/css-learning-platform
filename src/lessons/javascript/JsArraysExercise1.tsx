@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 6 — المصفوفات (Arrays)
@@ -435,34 +435,10 @@ console.log(fruits.includes("موز")); // true`}
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-6"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما فهرس أول عنصر في المصفوفة؟',
-            options: ['1', '0', '-1', 'أول حرف من الاسم'],
-            correctIndex: 1,
-            explanation: 'المصفوفات في JavaScript تبدأ من الفهرس 0.',
-          },
-          {
-            question: 'ماذا يفعل push()؟',
-            options: [
-              'يحذف أول عنصر',
-              'يضيف عنصراً في البداية',
-              'يضيف عنصراً في النهاية',
-              'يُرتب المصفوفة',
-            ],
-            correctIndex: 2,
-            explanation: 'push() يضيف عنصراً (أو أكثر) في نهاية المصفوفة.',
-          },
-          {
-            question: 'ماذا يُرجع [1, 2, 3].length ؟',
-            options: ['2', '3', '4', 'undefined'],
-            correctIndex: 1,
-            explanation: '.length يُرجع عدد العناصر في المصفوفة = 3.',
-          },
-        ]}
+        lessonNum="6"
+        totalQuestions={8}
       />
     </>
   );

@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 4 — الحلقات التكرارية (Loops)
@@ -386,42 +386,10 @@ while (count < 3) {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-4"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'كم مرة تتكرر هذه الحلقة؟ for (let i = 0; i < 3; i++)',
-            options: ['2 مرات', '3 مرات', '4 مرات', 'لا نهائية'],
-            correctIndex: 1,
-            explanation:
-              'تبدأ من 0 وتتوقف عند 3 (غير شاملة): 0، 1، 2 = 3 مرات.',
-          },
-          {
-            question: 'ما الفرق بين for...of و for...in؟',
-            options: [
-              'لا فرق',
-              'for...of للقيم و for...in للمفاتيح',
-              'for...in أحدث',
-              'for...of أبطأ',
-            ],
-            correctIndex: 1,
-            explanation:
-              'for...of تعطيك القيم مباشرة، for...in تعطيك المفاتيح (الفهارس).',
-          },
-          {
-            question: 'ماذا يحدث إذا نسيت i++ في حلقة while؟',
-            options: [
-              'الحلقة لا تعمل',
-              'تطبع مرة واحدة',
-              'حلقة لا نهائية (infinite loop)',
-              'خطأ في الصياغة',
-            ],
-            correctIndex: 2,
-            explanation:
-              'بدون تحديث المتغير، يبقى الشرط true دائماً مما يسبب حلقة لا نهائية.',
-          },
-        ]}
+        lessonNum="4"
+        totalQuestions={8}
       />
     </>
   );

@@ -10,7 +10,7 @@ import { HintBox } from '../../features/code/HintBox';
 import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 11 — دوال المصفوفات (Array Methods)
@@ -388,48 +388,10 @@ const sum = nums.reduce((a, b) => a + b, 0); // 70`}
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-11"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ماذا يُرجع [1,2,3].map(n => n + 10)؟',
-            options: ['[1, 2, 3]', '[11, 12, 13]', '36', '[10, 20, 30]'],
-            correctIndex: 1,
-            explanation:
-              'map تطبق الدالة على كل عنصر: 1+10=11, 2+10=12, 3+10=13.',
-          },
-          {
-            question: 'ما الفرق بين find و filter؟',
-            options: [
-              'لا فرق بينهما',
-              'find تُرجع أول تطابق، filter تُرجع كل التطابقات',
-              'filter أسرع من find',
-              'find تُرجع مصفوفة، filter تُرجع عنصر واحد',
-            ],
-            correctIndex: 1,
-            explanation:
-              'find تتوقف عند أول عنصر يحقق الشرط، بينما filter تمر على كل العناصر.',
-          },
-          {
-            question: 'ماذا يُرجع [5,10,15].reduce((a,b) => a + b, 0)؟',
-            options: ['[5, 10, 15]', '15', '30', '0'],
-            correctIndex: 2,
-            explanation: 'reduce تجمع: 0+5=5, 5+10=15, 15+15=30.',
-          },
-          {
-            question: 'هل map تغير المصفوفة الأصلية؟',
-            options: [
-              'نعم',
-              'لا، تُرجع مصفوفة جديدة',
-              'أحياناً',
-              'فقط مع الأعداد',
-            ],
-            correctIndex: 1,
-            explanation:
-              'map, filter, find, reduce كلها لا تغير المصفوفة الأصلية.',
-          },
-        ]}
+        lessonNum="11"
+        totalQuestions={8}
       />
     </>
   );

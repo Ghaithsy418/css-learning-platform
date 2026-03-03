@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
+import { useLessonLock } from '../features/lessonLock/LessonLockContext';
 import type { UserProgress } from '../types/progress';
 
 /* ── Lesson name mapping ── */
@@ -44,12 +45,15 @@ const exerciseNames: Record<string, string> = {
 export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { refreshLocks: refreshContextLocks } = useLessonLock();
   const [allProgress, setAllProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'students' | 'lessons'>('students');
+  const [activeTab, setActiveTab] = useState<'students' | 'lessons'>(
+    'students',
+  );
   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
   const [lockLoading, setLockLoading] = useState<string | null>(null);
 
@@ -168,6 +172,8 @@ export default function AdminDashboard() {
           setLockedLessons(data.locked ?? []);
         }
       }
+      // Sync the app-wide lock context so all guards update immediately
+      refreshContextLocks();
     } catch {
       /* ignore */
     } finally {
@@ -441,7 +447,9 @@ function StudentRow({
             <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm font-bold text-indigo-300">
               {(student.userName || '?').charAt(0)}
             </div>
-            <span className="text-white font-medium">{student.userName || 'مستخدم'}</span>
+            <span className="text-white font-medium">
+              {student.userName || 'مستخدم'}
+            </span>
           </div>
         </td>
         <td className="text-center px-5 py-3">
@@ -494,8 +502,7 @@ function StudentRow({
               ) : (
                 Object.entries(student.lessonResults ?? {}).map(
                   ([lessonId, lesson]) => {
-                    const lessonLabel =
-                      lessonNames[lessonId] || lessonId;
+                    const lessonLabel = lessonNames[lessonId] || lessonId;
                     const lessonPct =
                       lesson.maxTotalScore > 0
                         ? Math.round(
@@ -506,9 +513,7 @@ function StudentRow({
                       expandedLesson === `${student.userId}-${lessonId}`;
                     const wrongExercises = Object.entries(
                       lesson.exercises,
-                    ).filter(
-                      ([, ex]) => ex.wrong && ex.wrong.length > 0,
-                    );
+                    ).filter(([, ex]) => ex.wrong && ex.wrong.length > 0);
 
                     return (
                       <div
@@ -518,9 +523,7 @@ function StudentRow({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onToggleLesson(
-                              `${student.userId}-${lessonId}`,
-                            );
+                            onToggleLesson(`${student.userId}-${lessonId}`);
                           }}
                           className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-white/5 transition-colors rounded-lg"
                         >
@@ -737,8 +740,7 @@ function LessonManager({
           <strong className="text-emerald-400">{totalAll - totalLocked}</strong>
         </span>
         <span>
-          🔒 مقفل:{' '}
-          <strong className="text-red-400">{totalLocked}</strong>
+          🔒 مقفل: <strong className="text-red-400">{totalLocked}</strong>
         </span>
       </div>
 
@@ -764,9 +766,7 @@ function LessonManager({
                   className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.03] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span
-                      className={`text-lg ${isLocked ? 'opacity-50' : ''}`}
-                    >
+                    <span className={`text-lg ${isLocked ? 'opacity-50' : ''}`}>
                       {isLocked ? '🔒' : '🔓'}
                     </span>
                     <span

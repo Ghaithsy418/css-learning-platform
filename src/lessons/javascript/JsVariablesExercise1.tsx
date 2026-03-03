@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    JS Exercise 1 — المتغيرات وأنواع البيانات
@@ -151,7 +151,14 @@ const JsVariablesExercise1: React.FC = () => {
   return (
     <>
       {/* ═══════ Exercise 1: Declaring Variables ═══════ */}
-      <ExerciseSection title="التمرين الأول: تعريف المتغيرات" borderColor="amber" lessonId="js-1" exerciseId="ex1" maxPoints={15} inputCount={3}>
+      <ExerciseSection
+        title="التمرين الأول: تعريف المتغيرات"
+        borderColor="amber"
+        lessonId="js-1"
+        exerciseId="ex1"
+        maxPoints={15}
+        inputCount={3}
+      >
         <Explanation>
           <p>
             في JavaScript يمكنك تعريف المتغيرات باستخدام{' '}
@@ -257,7 +264,14 @@ const JsVariablesExercise1: React.FC = () => {
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: Data Types ═══════ */}
-      <ExerciseSection title="التمرين الثاني: أنواع البيانات" borderColor="amber" lessonId="js-1" exerciseId="ex2" maxPoints={15} inputCount={3}>
+      <ExerciseSection
+        title="التمرين الثاني: أنواع البيانات"
+        borderColor="amber"
+        lessonId="js-1"
+        exerciseId="ex2"
+        maxPoints={15}
+        inputCount={3}
+      >
         <Explanation>
           <p>
             JavaScript لديها أنواع بيانات مختلفة. أكمل القيم التالية لكل نوع
@@ -379,7 +393,14 @@ const JsVariablesExercise1: React.FC = () => {
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: Template Literals ═══════ */}
-      <ExerciseSection title="التمرين الثالث: القوالب النصية (Template Literals)" borderColor="amber" lessonId="js-1" exerciseId="ex3" maxPoints={10} inputCount={2}>
+      <ExerciseSection
+        title="التمرين الثالث: القوالب النصية (Template Literals)"
+        borderColor="amber"
+        lessonId="js-1"
+        exerciseId="ex3"
+        maxPoints={10}
+        inputCount={2}
+      >
         <Explanation>
           <p>
             بدلاً من دمج النصوص بعلامة{' '}
@@ -501,34 +522,10 @@ const JsVariablesExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-1"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما الفرق الرئيسي بين let و const؟',
-            options: [
-              'let أسرع من const',
-              'const لا يمكن تغيير قيمته بعد التعريف',
-              'let للأرقام و const للنصوص',
-              'لا فرق بينهما',
-            ],
-            correctIndex: 1,
-            explanation: 'const (ثابت) لا يمكن إعادة تعيين قيمته، بينما let يمكن تغيير قيمته.',
-          },
-          {
-            question: 'أي من التالي يُعتبر نوع بيانات String؟',
-            options: ['42', 'true', '"مرحبا"', 'null'],
-            correctIndex: 2,
-            explanation: 'النصوص (String) تُكتب بين علامات تنصيص مزدوجة أو مفردة أو backtick.',
-          },
-          {
-            question: 'ما هو الرمز المُستخدم لتضمين متغير في Template Literal؟',
-            options: ['#{variable}', '${variable}', '@{variable}', '%{variable}'],
-            correctIndex: 1,
-            explanation: 'نستخدم ${} داخل backtick ` لتضمين المتغيرات في القوالب النصية.',
-          },
-        ]}
+        lessonNum="1"
+        totalQuestions={8}
       />
     </>
   );

@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 10 — النصوص (Strings)
@@ -420,29 +420,10 @@ names.split(",")    // ["أحمد", "سارة", "محمد"]`}
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-10"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ماذا يُرجع "Hello".toUpperCase()؟',
-            options: ['"hello"', '"HELLO"', '"Hello"', 'خطأ'],
-            correctIndex: 1,
-            explanation: 'toUpperCase() تحوّل كل الأحرف لأحرف كبيرة.',
-          },
-          {
-            question: 'ماذا يُرجع "abc".indexOf("z")؟',
-            options: ['0', 'false', '-1', 'null'],
-            correctIndex: 2,
-            explanation: 'indexOf تُرجع -1 عندما لا تجد النص المطلوب.',
-          },
-          {
-            question: 'ماذا يُرجع "a-b-c".split("-")؟',
-            options: ['"abc"', '["a", "b", "c"]', '["a-b-c"]', '3'],
-            correctIndex: 1,
-            explanation: 'split("-") تقسم النص عند كل شرطة وتُرجع مصفوفة.',
-          },
-        ]}
+        lessonNum="10"
+        totalQuestions={8}
       />
     </>
   );

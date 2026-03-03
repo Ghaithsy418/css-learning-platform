@@ -12,7 +12,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsFunction from '../../features/jsSyntax/JsFunction';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 9 — الأحداث (Events)
@@ -408,42 +408,10 @@ const JsEventsExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-9"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما الحدث الذي ينطلق عند كل حرف يُكتب في حقل إدخال؟',
-            options: ['change', 'click', 'input', 'keypress'],
-            correctIndex: 2,
-            explanation:
-              '"input" ينطلق فوراً مع كل تغيير. "change" ينتظر فقدان التركيز.',
-          },
-          {
-            question: 'كيف تحصل على قيمة حقل إدخال عند استماعك لحدث input؟',
-            options: [
-              'event.value',
-              'event.target.value',
-              'event.input',
-              'this.value',
-            ],
-            correctIndex: 1,
-            explanation:
-              'event.target يشير للعنصر المُستهدف، و.value يعطيك محتواه.',
-          },
-          {
-            question: 'ما الفرق بين mouseover و mouseenter؟',
-            options: [
-              'لا فرق',
-              'mouseover يتفعل على العناصر الأبناء أيضاً',
-              'mouseenter أقدم',
-              'mouseover للموبايل فقط',
-            ],
-            correctIndex: 1,
-            explanation:
-              'mouseover ينطلق على العنصر وأبنائه (bubbles)، mouseenter فقط على العنصر نفسه.',
-          },
-        ]}
+        lessonNum="9"
+        totalQuestions={8}
       />
     </>
   );

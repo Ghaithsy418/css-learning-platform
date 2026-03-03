@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 3 — الجمل الشرطية (Conditionals)
@@ -410,37 +410,10 @@ const JsConditionalsExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-3"
-        exerciseId="quiz"
-        questions={[
-          {
-            question:
-              'ماذا يطبع هذا الكود؟ if (5 > 10) { console.log("A") } else { console.log("B") }',
-            options: ['A', 'B', 'undefined', 'خطأ'],
-            correctIndex: 1,
-            explanation:
-              'الشرط 5 > 10 هو false، لذلك يُنفذ كود else ويطبع "B".',
-          },
-          {
-            question: 'ما هو العامل الشرطي (ternary operator)؟',
-            options: [
-              'if...else',
-              'condition ? a : b',
-              'switch...case',
-              'for...of',
-            ],
-            correctIndex: 1,
-            explanation:
-              'العامل الشرطي: condition ? valueIfTrue : valueIfFalse — اختصار if/else.',
-          },
-          {
-            question: 'ما نتيجة: const x = true ? "نعم" : "لا";',
-            options: ['"نعم"', '"لا"', 'true', 'خطأ'],
-            correctIndex: 0,
-            explanation: 'الشرط true محقق، لذلك يُختار القيمة الأولى "نعم".',
-          },
-        ]}
+        lessonNum="3"
+        totalQuestions={8}
       />
     </>
   );

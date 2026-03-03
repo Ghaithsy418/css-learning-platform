@@ -11,7 +11,7 @@ import ConsoleOutput from '../../features/js/ConsoleOutput';
 import JsComment from '../../features/jsSyntax/JsComment';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    Lesson 7 — الكائنات (Objects)
@@ -364,46 +364,10 @@ person.email = "ahmed@email.com";`}
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-7"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'كيف تصل لخاصية "name" من كائن person؟',
-            options: [
-              'person(name)',
-              'person.name',
-              'person->name',
-              'person::name',
-            ],
-            correctIndex: 1,
-            explanation: 'نستخدم النقطة (dot notation): person.name',
-          },
-          {
-            question: 'ما الفرق بين المصفوفة والكائن؟',
-            options: [
-              'لا فرق',
-              'المصفوفة تستخدم فهارس رقمية، الكائن يستخدم مفاتيح نصية',
-              'الكائن أسرع دائماً',
-              'المصفوفة للنصوص فقط',
-            ],
-            correctIndex: 1,
-            explanation:
-              'المصفوفة تُرتب بأرقام [0, 1, 2]، الكائن بأسماء { name, age }.',
-          },
-          {
-            question: 'هل يمكن إضافة خاصية جديدة لكائن بعد إنشائه بـ const؟',
-            options: [
-              'لا، const يمنع أي تعديل',
-              'نعم، const يمنع إعادة التعيين لكن يسمح بتعديل المحتوى',
-              'فقط إذا استخدمت let',
-              'نعم لكن فقط بـ bracket notation',
-            ],
-            correctIndex: 1,
-            explanation:
-              'const يمنع person = {} جديد، لكن يسمح بتعديل person.name أو إضافة person.email.',
-          },
-        ]}
+        lessonNum="7"
+        totalQuestions={8}
       />
     </>
   );

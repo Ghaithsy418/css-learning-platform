@@ -13,7 +13,7 @@ import JsComment from '../../features/jsSyntax/JsComment';
 import JsFunction from '../../features/jsSyntax/JsFunction';
 import JsKeyword from '../../features/jsSyntax/JsKeyword';
 import JsString from '../../features/jsSyntax/JsString';
-import QuizSection from '../../features/quiz/QuizSection';
+import StartQuizButton from '../../features/quiz/StartQuizButton';
 
 /* ════════════════════════════════════════════
    JS Exercise 3 — DOM والأحداث
@@ -107,7 +107,14 @@ const JsDomExercise1: React.FC = () => {
   return (
     <>
       {/* ═══════ Exercise 1: querySelector + style ═══════ */}
-      <ExerciseSection title="التمرين الأول: اختيار العناصر وتغيير الأنماط" borderColor="amber" lessonId="js-8" exerciseId="ex1" maxPoints={15} inputCount={3}>
+      <ExerciseSection
+        title="التمرين الأول: اختيار العناصر وتغيير الأنماط"
+        borderColor="amber"
+        lessonId="js-8"
+        exerciseId="ex1"
+        maxPoints={15}
+        inputCount={3}
+      >
         <Explanation>
           <p>
             باستخدام{' '}
@@ -258,7 +265,14 @@ const JsDomExercise1: React.FC = () => {
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: textContent / innerHTML ═══════ */}
-      <ExerciseSection title="التمرين الثاني: تغيير المحتوى" borderColor="amber" lessonId="js-8" exerciseId="ex2" maxPoints={5} inputCount={1}>
+      <ExerciseSection
+        title="التمرين الثاني: تغيير المحتوى"
+        borderColor="amber"
+        lessonId="js-8"
+        exerciseId="ex2"
+        maxPoints={5}
+        inputCount={1}
+      >
         <Explanation>
           <p>
             يمكنك تغيير محتوى أي عنصر باستخدام{' '}
@@ -404,7 +418,14 @@ const JsDomExercise1: React.FC = () => {
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: addEventListener ═══════ */}
-      <ExerciseSection title="التمرين الثالث: الأحداث (Events)" borderColor="amber" lessonId="js-8" exerciseId="ex3" maxPoints={10} inputCount={2}>
+      <ExerciseSection
+        title="التمرين الثالث: الأحداث (Events)"
+        borderColor="amber"
+        lessonId="js-8"
+        exerciseId="ex3"
+        maxPoints={10}
+        inputCount={2}
+      >
         <Explanation>
           <p>
             الأحداث تجعل صفحتك تفاعلية! استخدم{' '}
@@ -567,44 +588,10 @@ const JsDomExercise1: React.FC = () => {
       />
 
       {/* ═══════ اختبار ═══════ */}
-      <QuizSection
+      <StartQuizButton
         lessonId="js-8"
-        exerciseId="quiz"
-        questions={[
-          {
-            question: 'ما هي الدالة المُستخدمة لاختيار عنصر واحد في DOM؟',
-            options: [
-              'document.getElement()',
-              'document.querySelector()',
-              'document.findElement()',
-              'document.select()',
-            ],
-            correctIndex: 1,
-            explanation: 'querySelector تختار أول عنصر يطابق المُحدد (CSS Selector).',
-          },
-          {
-            question: 'ما الفرق بين textContent و innerHTML؟',
-            options: [
-              'لا فرق',
-              'textContent يُدخل نص فقط، innerHTML يُدخل HTML',
-              'innerHTML أسرع',
-              'textContent للأرقام فقط',
-            ],
-            correctIndex: 1,
-            explanation: 'textContent يتعامل مع النص فقط، بينما innerHTML يُحلل HTML ويعرضه.',
-          },
-          {
-            question: 'ماذا يفعل addEventListener؟',
-            options: [
-              'يحذف عنصراً من الصفحة',
-              'يُضيف CSS جديد',
-              'يربط دالة تُنفذ عند حدوث حدث معين',
-              'يُنشئ عنصراً جديداً',
-            ],
-            correctIndex: 2,
-            explanation: 'addEventListener يربط دالة (callback) بحدث مثل click أو input.',
-          },
-        ]}
+        lessonNum="8"
+        totalQuestions={8}
       />
     </>
   );

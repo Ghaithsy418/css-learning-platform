@@ -71,7 +71,7 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
   const fetchLocks = useCallback(async () => {
     try {
       if (isLocal) {
-        const raw = localStorage.getItem('locked_lessons');
+        const raw = localStorage.getItem('ta3allam_locked_lessons');
         setLockedLessons(raw ? JSON.parse(raw) : []);
       } else {
         const res = await fetch('/api/lessons-config');
