@@ -50,13 +50,13 @@ export const jsQuizzes: Record<string, LessonQuizConfig> = {
         explanation:
           'undefined هو نوع بيانات مستقل يعني أن المتغير تم تعريفه بدون إعطائه قيمة.',
       },
-      {
-        question: 'ما نتيجة typeof null ؟',
-        options: ['"null"', '"undefined"', '"object"', '"boolean"'],
-        correctIndex: 2,
-        explanation:
-          'هذا خطأ تاريخي في JavaScript — typeof null يُرجع "object" رغم أن null ليست كائناً.',
-      },
+      // {
+      //   question: 'ما نتيجة typeof null ؟',
+      //   options: ['"null"', '"undefined"', '"object"', '"boolean"'],
+      //   correctIndex: 2,
+      //   explanation:
+      //     'هذا خطأ تاريخي في JavaScript — typeof null يُرجع "object" رغم أن null ليست كائناً.',
+      // },
       {
         question: 'أي من التالي طريقة صحيحة لتعريف متغير؟',
         options: [

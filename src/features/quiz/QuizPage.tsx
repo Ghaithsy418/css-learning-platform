@@ -38,6 +38,15 @@ export default function QuizPage() {
   const allAnswered = answeredCount === totalQuestions;
   const maxPoints = totalQuestions * POINTS_PER_QUESTION;
   const earnedPoints = correctCount * POINTS_PER_QUESTION;
+  const normalizedExistingMax = existingResult
+    ? Math.min(existingResult.maxScore, maxPoints)
+    : null;
+  const normalizedExistingScore = existingResult
+    ? Math.min(
+        existingResult.score,
+        normalizedExistingMax ?? existingResult.score,
+      )
+    : null;
   const percentage =
     totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
   const passed = percentage > 50;
@@ -148,8 +157,8 @@ export default function QuizPage() {
           {existingResult && (
             <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm">
               <p className="text-amber-800 font-bold">
-                نتيجتك السابقة: {existingResult.score} /{' '}
-                {existingResult.maxScore} نقطة
+                نتيجتك السابقة: {normalizedExistingScore} /{' '}
+                {normalizedExistingMax} نقطة
               </p>
               <p className="text-amber-600 text-xs mt-1">
                 يمكنك إعادة الاختبار لتحسين نتيجتك

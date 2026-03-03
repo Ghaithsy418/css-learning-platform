@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { getTextDirection } from '../../utils/textDirection';
 
 export interface QuizQuestionData {
   question: string;
@@ -29,6 +30,7 @@ const QuizQuestion: React.FC<QuizQuestionProps> = ({
   const [selected, setSelected] = useState<number | null>(null);
   const isAnswered = selected !== null;
   const isCorrect = selected === correctIndex;
+  const questionDir = getTextDirection(question);
 
   const handleSelect = (index: number) => {
     if (isAnswered) return;
@@ -39,7 +41,12 @@ const QuizQuestion: React.FC<QuizQuestionProps> = ({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6">
       {/* Question text */}
-      <p className="text-gray-800 font-semibold text-base sm:text-lg leading-relaxed mb-4">
+      <p
+        className={`text-gray-800 font-semibold text-base sm:text-lg leading-relaxed mb-4 ${
+          questionDir === 'rtl' ? 'text-right' : 'text-left'
+        }`}
+        dir={questionDir}
+      >
         {question}
       </p>
 
@@ -48,6 +55,7 @@ const QuizQuestion: React.FC<QuizQuestionProps> = ({
         {options.map((option, i) => {
           const isThis = selected === i;
           const isCorrectOption = i === correctIndex;
+          const optionDir = getTextDirection(option);
 
           let borderColor = 'border-gray-200 hover:border-gray-300';
           let bg = 'bg-gray-50 hover:bg-gray-100';
@@ -78,14 +86,19 @@ const QuizQuestion: React.FC<QuizQuestionProps> = ({
               key={i}
               onClick={() => handleSelect(i)}
               disabled={isAnswered}
-              className={`w-full flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-right ${borderColor} ${bg} ${textColor} ${!isAnswered ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`w-full flex items-center gap-3 p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${borderColor} ${bg} ${textColor} ${!isAnswered ? 'cursor-pointer' : 'cursor-default'}`}
             >
               <span
                 className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 transition-colors duration-200 ${labelBg}`}
               >
                 {optionLabels[i] ?? i + 1}
               </span>
-              <span className="flex-1 text-sm sm:text-base font-medium">
+              <span
+                dir={optionDir}
+                className={`flex-1 text-sm sm:text-base font-medium ${
+                  optionDir === 'rtl' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {option}
               </span>
               {isAnswered && isCorrectOption && (

@@ -19,6 +19,7 @@ import type {
   UserProgress,
 } from '../../types/progress';
 import { useAuth } from '../auth/AuthContext';
+import { jsQuizzes } from '../quiz/jsQuizData';
 
 interface ProgressState {
   progress: UserProgress | null;
@@ -196,7 +197,24 @@ export const ProgressProvider: React.FC<{ children: ReactNode }> = ({
   /* Get a specific exercise result */
   const getExerciseResult = useCallback(
     (lessonId: string, exerciseId: string): ExerciseResult | null => {
-      return progress?.lessonResults[lessonId]?.exercises[exerciseId] ?? null;
+      const result =
+        progress?.lessonResults[lessonId]?.exercises[exerciseId] ?? null;
+
+      if (!result) return null;
+
+      if (exerciseId === 'quiz') {
+        const quizConfig = jsQuizzes[lessonId];
+        if (quizConfig) {
+          const currentMaxScore = quizConfig.questions.length * 5;
+          return {
+            ...result,
+            maxScore: currentMaxScore,
+            score: Math.min(result.score, currentMaxScore),
+          };
+        }
+      }
+
+      return result;
     },
     [progress],
   );

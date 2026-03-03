@@ -525,7 +525,7 @@ const JsVariablesExercise1: React.FC = () => {
       <StartQuizButton
         lessonId="js-1"
         lessonNum="1"
-        totalQuestions={8}
+        totalQuestions={7}
       />
     </>
   );

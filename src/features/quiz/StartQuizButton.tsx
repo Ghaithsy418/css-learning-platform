@@ -21,6 +21,15 @@ export default function StartQuizButton({
   const { getExerciseResult } = useProgress();
   const existingResult = getExerciseResult(lessonId, 'quiz');
   const maxPoints = totalQuestions * 5;
+  const normalizedExistingMax = existingResult
+    ? Math.min(existingResult.maxScore, maxPoints)
+    : null;
+  const normalizedExistingScore = existingResult
+    ? Math.min(
+        existingResult.score,
+        normalizedExistingMax ?? existingResult.score,
+      )
+    : null;
 
   return (
     <div className="mt-10 mb-6">
@@ -48,7 +57,7 @@ export default function StartQuizButton({
               نتيجتك السابقة:{' '}
             </span>
             <span className="font-bold text-amber-900">
-              {existingResult.score} / {existingResult.maxScore}
+              {normalizedExistingScore} / {normalizedExistingMax}
             </span>
             <span className="text-amber-500 text-xs mr-2">نقطة</span>
           </div>

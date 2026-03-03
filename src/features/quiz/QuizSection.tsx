@@ -41,6 +41,15 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   // Check existing result
   const existingResult =
     lessonId && exerciseId ? getExerciseResult(lessonId, exerciseId) : null;
+  const normalizedExistingMax = existingResult
+    ? Math.min(existingResult.maxScore, maxPoints)
+    : null;
+  const normalizedExistingScore = existingResult
+    ? Math.min(
+        existingResult.score,
+        normalizedExistingMax ?? existingResult.score,
+      )
+    : null;
 
   const handleAnswer = (
     index: number,
@@ -155,7 +164,7 @@ const QuizSection: React.FC<QuizSectionProps> = ({
         <div className="mt-4 p-3 rounded-lg bg-gray-50 border border-gray-200 text-center text-sm text-gray-500">
           نتيجتك السابقة:{' '}
           <span className="font-bold text-gray-700">
-            {existingResult.score} / {existingResult.maxScore}
+            {normalizedExistingScore} / {normalizedExistingMax}
           </span>{' '}
           نقطة
         </div>
