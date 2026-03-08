@@ -202,7 +202,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setValue1}
               width="w-32"
               hint="القيمة"
-              correctValue='"أحمد"'
+              correctValue={`"${/a-zA-Z/}"`}
             />
             ;
           </CodeLine>
@@ -304,7 +304,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setNumValue}
               width="w-20"
               hint="رقم"
-              correctValue="25"
+              correctValue={`${/0-9+/}`}
             />
             ; <JsComment>// Number</JsComment>
           </CodeLine>
@@ -315,7 +315,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setStrValue}
               width="w-28"
               hint='"نص"'
-              correctValue='"أحمد"'
+              correctValue={`"${/a-zA-Z/}"`}
             />
             ; <JsComment>// String</JsComment>
           </CodeLine>
@@ -425,7 +425,7 @@ const JsVariablesExercise1: React.FC = () => {
                 onChange={setTemplateName}
                 width="w-24"
                 hint="اسمك"
-                correctValue="غيث"
+                correctValue={`"${/a-zA-Z/}"`}
               />
               "
             </JsString>
@@ -438,7 +438,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setTemplateAge}
               width="w-16"
               hint="عمرك"
-              correctValue="20"
+              correctValue={`${/0-9+/}`}
             />
             ;
           </CodeLine>
