@@ -75,12 +75,12 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
         show={showAnswer}
         onToggle={() => setShowAnswer(!showAnswer)}
       >
-        <pre
-          dir="ltr"
-          className="bg-gray-100 p-4 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto whitespace-pre"
-        >
-          {answerCode}
-        </pre>
+        <FreeCodeEditor
+          defaultCode={answerCode}
+          language="javascript"
+          readOnly
+          height={220}
+        />
       </AnswerKey>
 
       {/* Completion tracking */}

@@ -14,6 +14,8 @@ interface CodeInputProps {
   id?: string;
   /** Expected correct answer for auto-validation */
   correctValue?: string;
+  /** Optional custom validator for flexible answers */
+  validator?: (value: string) => boolean;
   /** Called whenever validation state changes */
   onValidate?: (isCorrect: boolean) => void;
 }
@@ -25,6 +27,7 @@ const CodeInput: React.FC<CodeInputProps> = ({
   width = 'w-40',
   id,
   correctValue,
+  validator,
   onValidate,
 }) => {
   const [touched, setTouched] = useState(false);
@@ -37,15 +40,16 @@ const CodeInput: React.FC<CodeInputProps> = ({
   }
 
   const normalise = (v: string) => v.trim().toLowerCase().replace(/\s+/g, ' ');
+  const hasValidation = correctValue != null || validator != null;
   const isCorrect =
-    correctValue != null &&
     value.trim() !== '' &&
-    normalise(value) === normalise(correctValue);
-  const isWrong =
-    correctValue != null && touched && value.trim() !== '' && !isCorrect;
+    (validator
+      ? validator(value)
+      : correctValue != null && normalise(value) === normalise(correctValue));
+  const isWrong = hasValidation && touched && value.trim() !== '' && !isCorrect;
 
   useEffect(() => {
-    if (correctValue != null && value.trim() !== '') {
+    if (hasValidation && value.trim() !== '') {
       onValidate?.(isCorrect);
       // Register with parent ExerciseSection
       if (exerciseCtx && indexRef.current != null) {
@@ -54,7 +58,7 @@ const CodeInput: React.FC<CodeInputProps> = ({
         exerciseCtx.registerAnswer(key, value.trim());
       }
     }
-  }, [isCorrect, correctValue, value, onValidate, exerciseCtx, id]);
+  }, [isCorrect, hasValidation, value, onValidate, exerciseCtx, id]);
 
   const borderClass = isCorrect
     ? 'border-emerald-400 ring-2 ring-emerald-100 bg-emerald-50'

@@ -19,6 +19,25 @@ import StartQuizButton from '../../features/quiz/StartQuizButton';
 ════════════════════════════════════════════ */
 
 const JsVariablesExercise1: React.FC = () => {
+  const isNonEmpty = (value: string) => value.trim().length > 0;
+  const isValidIdentifier = (value: string) =>
+    /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(value.trim());
+  const isQuotedString = (value: string) => {
+    const trimmed = value.trim();
+    return (
+      (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length >= 2)
+    );
+  };
+  const isValidNumber = (value: string) => {
+    const trimmed = value.trim();
+    return trimmed !== '' && !Number.isNaN(Number(trimmed));
+  };
+  const isBooleanLiteral = (value: string) => {
+    const trimmed = value.trim().toLowerCase();
+    return trimmed === 'true' || trimmed === 'false';
+  };
+
   /* ── Exercise 1: let / const / var ── */
   const [keyword1, setKeyword1] = useState('');
   const [varName1, setVarName1] = useState('');
@@ -194,7 +213,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setVarName1}
               width="w-24"
               hint="اسم المتغير"
-              correctValue="myName"
+              validator={isValidIdentifier}
             />{' '}
             ={' '}
             <CodeInput
@@ -202,7 +221,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setValue1}
               width="w-32"
               hint="القيمة"
-              correctValue={`"${/a-zA-Z/}"`}
+              validator={isQuotedString}
             />
             ;
           </CodeLine>
@@ -304,7 +323,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setNumValue}
               width="w-20"
               hint="رقم"
-              correctValue={`${/0-9+/}`}
+              validator={isValidNumber}
             />
             ; <JsComment>// Number</JsComment>
           </CodeLine>
@@ -315,7 +334,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setStrValue}
               width="w-28"
               hint='"نص"'
-              correctValue={`"${/a-zA-Z/}"`}
+              validator={isQuotedString}
             />
             ; <JsComment>// String</JsComment>
           </CodeLine>
@@ -326,7 +345,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setBoolValue}
               width="w-20"
               hint="true/false"
-              correctValue="true"
+              validator={isBooleanLiteral}
             />
             ; <JsComment>// Boolean</JsComment>
           </CodeLine>
@@ -425,7 +444,7 @@ const JsVariablesExercise1: React.FC = () => {
                 onChange={setTemplateName}
                 width="w-24"
                 hint="اسمك"
-                correctValue={`"${/a-zA-Z/}"`}
+                validator={isNonEmpty}
               />
               "
             </JsString>
@@ -438,7 +457,7 @@ const JsVariablesExercise1: React.FC = () => {
               onChange={setTemplateAge}
               width="w-16"
               hint="عمرك"
-              correctValue={`${/0-9+/}`}
+              validator={isValidNumber}
             />
             ;
           </CodeLine>
