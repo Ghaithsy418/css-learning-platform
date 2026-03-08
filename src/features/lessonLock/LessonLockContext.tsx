@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useAuth } from '../auth/AuthContext';
 
 /* ── Lesson ID → Route mapping per track ── */
 export const cssLessonRoutes: { id: string; path: string }[] = [
@@ -67,6 +68,12 @@ const isLocal =
 
 export function LessonLockProvider({ children }: { children: ReactNode }) {
   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
+  const { user } = useAuth();
+
+  const isBypassUser =
+    user?.role === 'admin' ||
+    user?.username?.trim().toLowerCase() === 'ghaith' ||
+    user?.name?.trim().toLowerCase() === 'ghaith';
 
   const fetchLocks = useCallback(async () => {
     try {
@@ -90,25 +97,30 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
   }, [fetchLocks]);
 
   const isLocked = useCallback(
-    (lessonId: string) => lockedLessons.includes(lessonId),
-    [lockedLessons],
+    (lessonId: string) => {
+      if (isBypassUser) return false;
+      return lockedLessons.includes(lessonId);
+    },
+    [isBypassUser, lockedLessons],
   );
 
   const getFirstUnlockedRoute = useCallback(
     (track: 'css' | 'js'): string | null => {
       const routes = track === 'css' ? cssLessonRoutes : jsLessonRoutes;
+      if (isBypassUser) return routes[0]?.path ?? null;
       const found = routes.find((r) => !lockedLessons.includes(r.id));
       return found ? found.path : null;
     },
-    [lockedLessons],
+    [isBypassUser, lockedLessons],
   );
 
   const isTrackFullyLocked = useCallback(
     (track: 'css' | 'js'): boolean => {
+      if (isBypassUser) return false;
       const routes = track === 'css' ? cssLessonRoutes : jsLessonRoutes;
       return routes.every((r) => lockedLessons.includes(r.id));
     },
-    [lockedLessons],
+    [isBypassUser, lockedLessons],
   );
 
   return (

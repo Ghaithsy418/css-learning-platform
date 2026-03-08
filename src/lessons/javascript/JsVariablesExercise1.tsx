@@ -25,7 +25,9 @@ const JsVariablesExercise1: React.FC = () => {
   const isQuotedString = (value: string) => {
     const trimmed = value.trim();
     return (
-      (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) ||
+      (trimmed.startsWith('"') &&
+        trimmed.endsWith('"') &&
+        trimmed.length >= 2) ||
       (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length >= 2)
     );
   };

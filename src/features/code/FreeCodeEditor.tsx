@@ -29,7 +29,10 @@ const FreeCodeEditor: React.FC<FreeCodeEditorProps> = ({
   }, [defaultCode]);
 
   return (
-    <div dir="ltr" className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 my-4">
+    <div
+      dir="ltr"
+      className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 my-4"
+    >
       <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-950 border-b border-gray-800">
         <div className="w-3 h-3 rounded-full bg-red-400/80" />
         <div className="w-3 h-3 rounded-full bg-amber-400/80" />
@@ -59,7 +62,9 @@ const FreeCodeEditor: React.FC<FreeCodeEditorProps> = ({
           setCode(nextCode);
           onCodeChange?.(nextCode);
         }}
-        loading={<div className="p-4 text-sm text-gray-300">Loading editor...</div>}
+        loading={
+          <div className="p-4 text-sm text-gray-300">Loading editor...</div>
+        }
       />
 
       {!code.trim() && !readOnly && (

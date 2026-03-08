@@ -45,7 +45,12 @@ export default function Confetti({ active, duration = 4000 }: ConfettiProps) {
       numberOfPieces={260}
       gravity={0.22}
       tweenDuration={duration}
-      style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 9999,
+      }}
     />
   );
 }
