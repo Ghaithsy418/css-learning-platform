@@ -40,5 +40,11 @@
     "password": "Admin@Ctrl9",
     "name": "المشرف",
     "role": "admin"
-  }
+  },{
+    "id": 7,
+    "username": "ghaith",
+    "password": "gzr192837",
+    "name": "غيث",
+    "role": "student"
+  },
 ]
