@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { AnswerKey } from '../../features/code/AnswerKey';
 import CodeEditor from '../../features/code/CodeEditor';
 import CodeInput from '../../features/code/CodeInput';
 import CodeLine from '../../features/code/CodeLine';
@@ -30,10 +29,6 @@ const JsOperatorsExercise1: React.FC = () => {
   /* ── Exercise 3: Logical ── */
   const [logic1, setLogic1] = useState('');
   const [logic2, setLogic2] = useState('');
-
-  const [showAnswer1, setShowAnswer1] = useState(false);
-  const [showAnswer2, setShowAnswer2] = useState(false);
-  const [showAnswer3, setShowAnswer3] = useState(false);
 
   /* ── Console 1: Arithmetic ── */
   const console1Lines = useMemo(() => {
@@ -207,7 +202,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={op1}
               onChange={setOp1}
               width="w-10"
-              hint="+"
               correctValue="+"
             />{' '}
             5; <JsComment>// الجمع</JsComment>
@@ -218,7 +212,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={op2}
               onChange={setOp2}
               width="w-10"
-              hint="%"
               correctValue="%"
             />{' '}
             3; <JsComment>// باقي القسمة</JsComment>
@@ -229,7 +222,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={op3}
               onChange={setOp3}
               width="w-10"
-              hint="**"
               correctValue="**"
             />{' '}
             3; <JsComment>// الأس (2³ = 8)</JsComment>
@@ -272,36 +264,6 @@ const JsOperatorsExercise1: React.FC = () => {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer1}
-          onToggle={() => setShowAnswer1(!showAnswer1)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const sum = 10 <strong>+</strong> 5;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const remainder = 10 <strong>%</strong> 3;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const power = 2 <strong>**</strong> 3;
-            </code>
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: Comparison Operators ═══════ */}
@@ -345,7 +307,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={comp1}
               onChange={setComp1}
               width="w-14"
-              hint="==="
               correctValue="==="
             />{' '}
             5; <JsComment>// المساواة التامة</JsComment>
@@ -356,7 +317,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={comp2}
               onChange={setComp2}
               width="w-14"
-              hint="!=="
               correctValue="!=="
             />{' '}
             5; <JsComment>// عدم المساواة</JsComment>
@@ -367,7 +327,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={comp3}
               onChange={setComp3}
               width="w-12"
-              hint=">"
               correctValue=">"
             />{' '}
             5; <JsComment>// أكبر من</JsComment>
@@ -403,35 +362,6 @@ const JsOperatorsExercise1: React.FC = () => {
           </ul>
         </HintBox>
 
-        <AnswerKey
-          show={showAnswer2}
-          onToggle={() => setShowAnswer2(!showAnswer2)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const isEqual = 5 <strong>===</strong> 5;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const isNotEqual = 10 <strong>!==</strong> 5;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const isGreater = 10 <strong>&gt;</strong> 5;
-            </code>
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: Logical Operators ═══════ */}
@@ -480,7 +410,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={logic1}
               onChange={setLogic1}
               width="w-12"
-              hint="&&"
               correctValue="&&"
             />{' '}
             hasID;
@@ -501,7 +430,6 @@ const JsOperatorsExercise1: React.FC = () => {
               value={logic2}
               onChange={setLogic2}
               width="w-12"
-              hint="||"
               correctValue="||"
             />{' '}
             (age {'<'} 12);
@@ -532,28 +460,6 @@ const JsOperatorsExercise1: React.FC = () => {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer3}
-          onToggle={() => setShowAnswer3(!showAnswer3)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const canEnter = (age {'>'} 18) <strong>&&</strong> hasID;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const discount = isStudent <strong>||</strong> (age {'<'} 12);
-            </code>
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ تمرين كتابة ═══════ */}
