@@ -8,7 +8,21 @@ export interface ExerciseResult {
   wrong?: string[];
   /** Exact answers the student typed, keyed by input id */
   answers?: Record<string, string>;
+  submissions?: HomeworkSubmission[];
   completedAt: string; // ISO timestamp
+}
+
+export interface HomeworkOutputLine {
+  type: 'log' | 'error' | 'info' | 'result';
+  text: string;
+}
+
+export interface HomeworkSubmission {
+  id: string;
+  title: string;
+  code: string;
+  submittedAt: string;
+  output?: HomeworkOutputLine[];
 }
 
 export interface LessonProgress {
@@ -26,6 +40,7 @@ export interface UserProgress {
 }
 
 export interface SubmitResultPayload {
+  type?: 'exercise';
   userId: number;
   userName: string;
   lessonId: string;
@@ -35,3 +50,25 @@ export interface SubmitResultPayload {
   wrong?: string[];
   answers?: Record<string, string>;
 }
+
+export interface SubmitHomeworkPayload {
+  type: 'homework';
+  userId: number;
+  userName: string;
+  lessonId: string;
+  exerciseId: string;
+  title: string;
+  code: string;
+  output?: HomeworkOutputLine[];
+}
+
+export interface LeaderboardEntry {
+  userId: number;
+  userName: string;
+  totalPoints: number;
+  rank: number;
+}
+
+export type ProgressSubmissionPayload =
+  | SubmitResultPayload
+  | SubmitHomeworkPayload;

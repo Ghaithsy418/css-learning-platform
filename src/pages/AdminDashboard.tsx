@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { useLessonLock } from '../features/lessonLock/LessonLockContext';
-import type { UserProgress } from '../types/progress';
+import type { HomeworkSubmission, UserProgress } from '../types/progress';
 
 /* ── Lesson name mapping ── */
 const lessonNames: Record<string, string> = {
@@ -38,9 +38,25 @@ const exerciseNames: Record<string, string> = {
   ex1: 'التمرين الأول',
   ex2: 'التمرين الثاني',
   ex3: 'التمرين الثالث',
+  ex4: 'التمرين الرابع',
   quiz: 'الاختبار',
   'free-code': 'تمرين الكتابة',
 };
+
+const TRACKED_LESSON_IDS = new Set(Object.keys(lessonNames));
+
+function getTrackedLessonEntries(progress: UserProgress) {
+  return Object.entries(progress.lessonResults ?? {}).filter(([lessonId]) =>
+    TRACKED_LESSON_IDS.has(lessonId),
+  );
+}
+
+function getHomeworkSubmissionsForStudent(progress: UserProgress) {
+  return (
+    progress.lessonResults?.['js-homework']?.exercises?.['submission-history']
+      ?.submissions ?? []
+  );
+}
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -51,9 +67,9 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'students' | 'lessons'>(
-    'students',
-  );
+  const [activeTab, setActiveTab] = useState<
+    'students' | 'lessons' | 'homework'
+  >('students');
   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
   const [lockLoading, setLockLoading] = useState<string | null>(null);
 
@@ -194,6 +210,19 @@ export default function AdminDashboard() {
   }
 
   const totalLessons = Object.keys(lessonNames).length;
+  const homeworkSubmissions = allProgress
+    .flatMap((student) =>
+      getHomeworkSubmissionsForStudent(student).map((submission) => ({
+        studentId: student.userId,
+        studentName: student.userName,
+        submission,
+      })),
+    )
+    .sort(
+      (left, right) =>
+        new Date(right.submission.submittedAt).getTime() -
+        new Date(left.submission.submittedAt).getTime(),
+    );
 
   return (
     <div
@@ -251,6 +280,16 @@ export default function AdminDashboard() {
             🔐 إدارة الدروس
           </button>
         </div>
+        <button
+          onClick={() => setActiveTab('homework')}
+          className={`px-5 py-2.5 text-sm font-medium rounded-t-lg transition-all ${
+            activeTab === 'homework'
+              ? 'bg-white/10 text-white border-b-2 border-emerald-500'
+              : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+          }`}
+        >
+          📨 الواجبات البرمجية
+        </button>
 
         {/* ═══ LESSONS TAB ═══ */}
         {activeTab === 'lessons' && (
@@ -259,6 +298,10 @@ export default function AdminDashboard() {
             lockLoading={lockLoading}
             onToggle={toggleLessonLock}
           />
+        )}
+
+        {activeTab === 'homework' && (
+          <HomeworkTab submissions={homeworkSubmissions} />
         )}
 
         {/* ═══ STUDENTS TAB ═══ */}
@@ -292,8 +335,7 @@ export default function AdminDashboard() {
                   allProgress.length > 0
                     ? Math.round(
                         allProgress.reduce(
-                          (s, p) =>
-                            s + Object.keys(p.lessonResults ?? {}).length,
+                          (s, p) => s + getTrackedLessonEntries(p).length,
                           0,
                         ) / allProgress.length,
                       )
@@ -330,9 +372,8 @@ export default function AdminDashboard() {
                   {allProgress
                     .sort((a, b) => b.totalPoints - a.totalPoints)
                     .map((student) => {
-                      const lessonsCompleted = Object.keys(
-                        student.lessonResults ?? {},
-                      ).length;
+                      const lessonsCompleted =
+                        getTrackedLessonEntries(student).length;
                       const pct = Math.round(
                         (lessonsCompleted / totalLessons) * 100,
                       );
@@ -427,6 +468,7 @@ function StudentRow({
   expandedLesson: string | null;
   onToggleLesson: (lid: string) => void;
 }) {
+  const trackedLessons = getTrackedLessonEntries(student);
   const lastActive = student.lastUpdated
     ? new Date(student.lastUpdated).toLocaleDateString('ar-SA', {
         month: 'short',
@@ -439,7 +481,7 @@ function StudentRow({
   return (
     <>
       <tr
-        className={`border-b border-white/5 cursor-pointer transition-colors ${isExpanded ? 'bg-white/5' : 'hover:bg-white/[0.03]'}`}
+        className={`border-b border-white/5 cursor-pointer transition-colors ${isExpanded ? 'bg-white/5' : 'hover:bg-white/3'}`}
         onClick={onToggle}
       >
         <td className="px-5 py-3">
@@ -494,143 +536,214 @@ function StudentRow({
         <tr>
           <td
             colSpan={6}
-            className="px-5 py-4 bg-white/[0.02]"
+            className="px-5 py-4 bg-white/2"
           >
             <div className="space-y-2 max-w-3xl mr-10">
-              {Object.entries(student.lessonResults ?? {}).length === 0 ? (
+              {trackedLessons.length === 0 ? (
                 <p className="text-gray-500 text-sm">لم يبدأ أي درس بعد</p>
               ) : (
-                Object.entries(student.lessonResults ?? {}).map(
-                  ([lessonId, lesson]) => {
-                    const lessonLabel = lessonNames[lessonId] || lessonId;
-                    const lessonPct =
-                      lesson.maxTotalScore > 0
-                        ? Math.round(
-                            (lesson.totalScore / lesson.maxTotalScore) * 100,
-                          )
-                        : 0;
-                    const isLessonExpanded =
-                      expandedLesson === `${student.userId}-${lessonId}`;
-                    const wrongExercises = Object.entries(
-                      lesson.exercises,
-                    ).filter(([, ex]) => ex.wrong && ex.wrong.length > 0);
+                trackedLessons.map(([lessonId, lesson]) => {
+                  const lessonLabel = lessonNames[lessonId] || lessonId;
+                  const lessonPct =
+                    lesson.maxTotalScore > 0
+                      ? Math.round(
+                          (lesson.totalScore / lesson.maxTotalScore) * 100,
+                        )
+                      : 0;
+                  const isLessonExpanded =
+                    expandedLesson === `${student.userId}-${lessonId}`;
+                  const wrongExercises = Object.entries(
+                    lesson.exercises,
+                  ).filter(([, ex]) => ex.wrong && ex.wrong.length > 0);
 
-                    return (
-                      <div
-                        key={lessonId}
-                        className="bg-white/5 rounded-lg border border-white/5"
+                  return (
+                    <div
+                      key={lessonId}
+                      className="bg-white/5 rounded-lg border border-white/5"
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleLesson(`${student.userId}-${lessonId}`);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-white/5 transition-colors rounded-lg"
                       >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleLesson(`${student.userId}-${lessonId}`);
-                          }}
-                          className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-white/5 transition-colors rounded-lg"
-                        >
-                          <span className="text-gray-200 font-medium">
-                            {lessonLabel}
+                        <span className="text-gray-200 font-medium">
+                          {lessonLabel}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-amber-400 text-xs font-bold">
+                            {lesson.totalScore} / {lesson.maxTotalScore}
                           </span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-amber-400 text-xs font-bold">
-                              {lesson.totalScore} / {lesson.maxTotalScore}
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full ${
+                              lessonPct >= 80
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : lessonPct >= 50
+                                  ? 'bg-amber-500/20 text-amber-400'
+                                  : 'bg-red-500/20 text-red-400'
+                            }`}
+                          >
+                            {lessonPct}%
+                          </span>
+                          {wrongExercises.length > 0 && (
+                            <span className="text-red-400 text-xs">
+                              ⚠️ {wrongExercises.length} أخطاء
                             </span>
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full ${
-                                lessonPct >= 80
-                                  ? 'bg-emerald-500/20 text-emerald-400'
-                                  : lessonPct >= 50
-                                    ? 'bg-amber-500/20 text-amber-400'
-                                    : 'bg-red-500/20 text-red-400'
-                              }`}
-                            >
-                              {lessonPct}%
-                            </span>
-                            {wrongExercises.length > 0 && (
-                              <span className="text-red-400 text-xs">
-                                ⚠️ {wrongExercises.length} أخطاء
-                              </span>
-                            )}
-                            <span
-                              className={`text-gray-500 transition-transform inline-block text-xs ${isLessonExpanded ? 'rotate-90' : ''}`}
-                            >
-                              ◂
-                            </span>
-                          </div>
-                        </button>
+                          )}
+                          <span
+                            className={`text-gray-500 transition-transform inline-block text-xs ${isLessonExpanded ? 'rotate-90' : ''}`}
+                          >
+                            ◂
+                          </span>
+                        </div>
+                      </button>
 
-                        {isLessonExpanded && (
-                          <div className="px-4 pb-3 space-y-1.5 border-t border-white/5 pt-2">
-                            {Object.entries(lesson.exercises).map(
-                              ([exId, ex]) => (
-                                <div
-                                  key={exId}
-                                  className="rounded bg-white/[0.03] overflow-hidden"
-                                >
-                                  <div className="flex items-center justify-between text-xs py-1.5 px-3">
-                                    <span className="text-gray-400">
-                                      {exerciseNames[exId] || exId}
+                      {isLessonExpanded && (
+                        <div className="px-4 pb-3 space-y-1.5 border-t border-white/5 pt-2">
+                          {Object.entries(lesson.exercises).map(
+                            ([exId, ex]) => (
+                              <div
+                                key={exId}
+                                className="rounded bg-white/3 overflow-hidden"
+                              >
+                                <div className="flex items-center justify-between text-xs py-1.5 px-3">
+                                  <span className="text-gray-400">
+                                    {exerciseNames[exId] || exId}
+                                  </span>
+                                  <div className="flex items-center gap-3">
+                                    <span
+                                      className={`font-bold ${ex.score === ex.maxScore ? 'text-emerald-400' : 'text-amber-400'}`}
+                                    >
+                                      {ex.score} / {ex.maxScore}
                                     </span>
-                                    <div className="flex items-center gap-3">
-                                      <span
-                                        className={`font-bold ${ex.score === ex.maxScore ? 'text-emerald-400' : 'text-amber-400'}`}
-                                      >
-                                        {ex.score} / {ex.maxScore}
+                                    {ex.wrong && ex.wrong.length > 0 && (
+                                      <span className="text-red-400/80">
+                                        ❌{' '}
+                                        {ex.wrong
+                                          .map((w) => `"${w}"`)
+                                          .join('، ')}
                                       </span>
-                                      {ex.wrong && ex.wrong.length > 0 && (
-                                        <span className="text-red-400/80">
-                                          ❌{' '}
-                                          {ex.wrong
-                                            .map((w) => `"${w}"`)
-                                            .join('، ')}
-                                        </span>
+                                    )}
+                                  </div>
+                                </div>
+                                {/* Show exact answers */}
+                                {ex.answers &&
+                                  Object.keys(ex.answers).length > 0 && (
+                                    <div className="px-3 pb-2 space-y-1">
+                                      {Object.entries(ex.answers).map(
+                                        ([key, val]) => (
+                                          <div
+                                            key={key}
+                                            className="flex items-center gap-2 text-[11px] py-0.5 px-2 rounded bg-white/3"
+                                          >
+                                            <span className="text-gray-600 font-mono shrink-0">
+                                              {key}:
+                                            </span>
+                                            <span className="text-gray-300 font-mono font-medium">
+                                              {val}
+                                            </span>
+                                            {ex.wrong?.includes(key) ? (
+                                              <span className="text-red-400 text-[10px]">
+                                                ✗
+                                              </span>
+                                            ) : (
+                                              <span className="text-emerald-400 text-[10px]">
+                                                ✓
+                                              </span>
+                                            )}
+                                          </div>
+                                        ),
                                       )}
                                     </div>
-                                  </div>
-                                  {/* Show exact answers */}
-                                  {ex.answers &&
-                                    Object.keys(ex.answers).length > 0 && (
-                                      <div className="px-3 pb-2 space-y-1">
-                                        {Object.entries(ex.answers).map(
-                                          ([key, val]) => (
-                                            <div
-                                              key={key}
-                                              className="flex items-center gap-2 text-[11px] py-0.5 px-2 rounded bg-white/[0.03]"
-                                            >
-                                              <span className="text-gray-600 font-mono shrink-0">
-                                                {key}:
-                                              </span>
-                                              <span className="text-gray-300 font-mono font-medium">
-                                                {val}
-                                              </span>
-                                              {ex.wrong?.includes(key) ? (
-                                                <span className="text-red-400 text-[10px]">
-                                                  ✗
-                                                </span>
-                                              ) : (
-                                                <span className="text-emerald-400 text-[10px]">
-                                                  ✓
-                                                </span>
-                                              )}
-                                            </div>
-                                          ),
-                                        )}
-                                      </div>
-                                    )}
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  },
-                )
+                                  )}
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           </td>
         </tr>
       )}
     </>
+  );
+}
+
+function HomeworkTab({
+  submissions,
+}: {
+  submissions: {
+    studentId: number;
+    studentName: string;
+    submission: HomeworkSubmission;
+  }[];
+}) {
+  if (submissions.length === 0) {
+    return (
+      <div className="text-center py-20 text-gray-500">
+        <p className="text-4xl mb-4">📭</p>
+        <p className="text-lg">لا توجد واجبات مرسلة بعد</p>
+        <p className="text-sm mt-2">
+          ستظهر هنا كل الإرسالات البرمجية من الطلاب
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {submissions.map(({ studentId, studentName, submission }) => (
+        <article
+          key={submission.id}
+          className="rounded-2xl border border-white/10 bg-white/5 p-5"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="text-right">
+              <h3 className="text-lg font-bold text-white">
+                {submission.title}
+              </h3>
+              <p className="mt-1 text-sm text-gray-400">
+                بواسطة {studentName} · رقم الطالب {studentId}
+              </p>
+            </div>
+            <span className="self-start rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300">
+              {new Date(submission.submittedAt).toLocaleString('ar-SA')}
+            </span>
+          </div>
+
+          <pre
+            dir="ltr"
+            className="mt-4 overflow-x-auto rounded-xl bg-gray-950 p-4 text-sm leading-6 text-gray-100"
+          >
+            {submission.code}
+          </pre>
+
+          {submission.output && submission.output.length > 0 && (
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+              <p className="mb-3 text-right text-xs font-bold text-gray-400">
+                ناتج التجربة قبل الإرسال
+              </p>
+              <div className="space-y-1 font-mono text-xs">
+                {submission.output.map((line, index) => (
+                  <div
+                    key={`${submission.id}-${index}`}
+                    className="flex items-start gap-2 text-gray-200"
+                  >
+                    <span className="text-gray-500">•</span>
+                    <span>{line.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -763,7 +876,7 @@ function LessonManager({
               return (
                 <div
                   key={lesson.id}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center justify-between px-5 py-3 hover:bg-white/3 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-lg ${isLocked ? 'opacity-50' : ''}`}>

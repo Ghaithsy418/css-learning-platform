@@ -29,9 +29,13 @@ const JsConditionalsExercise1: React.FC = () => {
   /* ── Exercise 3: ternary ── */
   const [ternaryOp, setTernaryOp] = useState('');
 
+  /* ── Exercise 4: switch/case ── */
+  const [dayNumber, setDayNumber] = useState('');
+
   const [showAnswer1, setShowAnswer1] = useState(false);
   const [showAnswer2, setShowAnswer2] = useState(false);
   const [showAnswer3, setShowAnswer3] = useState(false);
+  const [showAnswer4, setShowAnswer4] = useState(false);
 
   /* ── Console 1 ── */
   const console1Lines = useMemo(() => {
@@ -113,6 +117,44 @@ const JsConditionalsExercise1: React.FC = () => {
     }
     return lines;
   }, [ternaryOp]);
+
+  /* ── Console 4 ── */
+  const console4Lines = useMemo(() => {
+    const lines: { type: 'log' | 'error' | 'info' | 'result'; text: string }[] =
+      [];
+    const day = dayNumber.trim();
+
+    if (!day) return lines;
+
+    const dayMap: Record<number, string> = {
+      1: 'السبت',
+      2: 'الأحد',
+      3: 'الاثنين',
+      4: 'الثلاثاء',
+      5: 'الأربعاء',
+      6: 'الخميس',
+      7: 'الجمعة',
+    };
+
+    const num = Number(day);
+    if (Number.isNaN(num)) {
+      lines.push({ type: 'error', text: 'أدخل رقماً من 1 إلى 7' });
+      return lines;
+    }
+
+    if (!dayMap[num]) {
+      lines.push({
+        type: 'info',
+        text: 'هذه قيمة خارج الحالات، سيتم تنفيذ default.',
+      });
+      lines.push({ type: 'result', text: 'اليوم غير معروف' });
+      return lines;
+    }
+
+    lines.push({ type: 'log', text: `switch(dayNumber) => case ${num}` });
+    lines.push({ type: 'result', text: `اليوم هو: ${dayMap[num]} ✅` });
+    return lines;
+  }, [dayNumber]);
 
   return (
     <>
@@ -398,13 +440,130 @@ const JsConditionalsExercise1: React.FC = () => {
         </AnswerKey>
       </ExerciseSection>
 
+      {/* ═══════ Exercise 4: Switch / Case ═══════ */}
+      <ExerciseSection
+        title="التمرين الرابع: switch / case"
+        borderColor="amber"
+        lessonId="js-3"
+        exerciseId="ex4"
+        maxPoints={5}
+        inputCount={1}
+      >
+        <Explanation>
+          <p>
+            نستخدم{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              switch
+            </code>{' '}
+            عندما نريد مقارنة متغير واحد مع حالات متعددة بشكل واضح، مع{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              case
+            </code>{' '}
+            و{' '}
+            <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+              default
+            </code>
+            .
+          </p>
+        </Explanation>
+
+        <CodeEditor>
+          <CodeLine>
+            <JsKeyword>const</JsKeyword> dayNumber ={' '}
+            <CodeInput
+              value={dayNumber}
+              onChange={setDayNumber}
+              width="w-14"
+              hint="3"
+              correctValue="3"
+            />
+            ;
+          </CodeLine>
+          <CodeLine />
+          <CodeLine>
+            <JsKeyword>switch</JsKeyword> (dayNumber) {'{'}
+          </CodeLine>
+          <CodeLine indent={1}>
+            <JsKeyword>case</JsKeyword> 1:
+          </CodeLine>
+          <CodeLine indent={2}>
+            <JsKeyword>console</JsKeyword>.<JsKeyword>log</JsKeyword>(
+            <JsString>"السبت"</JsString>);
+          </CodeLine>
+          <CodeLine indent={2}>
+            <JsKeyword>break</JsKeyword>;
+          </CodeLine>
+          <CodeLine indent={1}>
+            <JsComment>// ... حالات أخرى ...</JsComment>
+          </CodeLine>
+          <CodeLine indent={1}>
+            <JsKeyword>default</JsKeyword>:
+          </CodeLine>
+          <CodeLine indent={2}>
+            <JsKeyword>console</JsKeyword>.<JsKeyword>log</JsKeyword>(
+            <JsString>"اليوم غير معروف"</JsString>);
+          </CodeLine>
+          <CodeLine>{'}'}</CodeLine>
+        </CodeEditor>
+
+        <ConsoleOutput lines={console4Lines} />
+
+        <HintBox>
+          <ul className="mr-5 leading-7">
+            <li>
+              كل{' '}
+              <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+                case
+              </code>{' '}
+              تمثل قيمة محددة
+            </li>
+            <li>
+              <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+                break
+              </code>{' '}
+              تمنع الانتقال للحالة التالية
+            </li>
+            <li>
+              <code className="bg-gray-200 px-2 py-0.5 rounded font-mono text-sm">
+                default
+              </code>{' '}
+              تُنفذ إذا لم تطابق أي حالة
+            </li>
+          </ul>
+        </HintBox>
+
+        <AnswerKey
+          show={showAnswer4}
+          onToggle={() => setShowAnswer4(!showAnswer4)}
+        >
+          <pre
+            dir="ltr"
+            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm leading-relaxed"
+          >
+            {`switch (dayNumber) {
+  case 1:
+    console.log("السبت");
+    break;
+  case 2:
+    console.log("الأحد");
+    break;
+  case 3:
+    console.log("الاثنين");
+    break;
+  default:
+    console.log("اليوم غير معروف");
+}`}
+          </pre>
+        </AnswerKey>
+      </ExerciseSection>
+
       {/* ═══════ تمرين كتابة ═══════ */}
       <FreeCodeExercise
         title="برنامج تصنيف العمر"
-        instructions="اكتب كوداً يأخذ عمراً ويطبع التصنيف: طفل (أقل من 13)، مراهق (13-17)، شاب (18-30)، بالغ (أكبر من 30)."
-        starterCode={`const age = 25;\n\n// استخدم if / else if / else\nif () {\n  console.log("طفل");\n} else if () {\n  \n} else if () {\n  \n} else {\n  \n}`}
-        answerCode={`const age = 25;\n\nif (age < 13) {\n  console.log("طفل");\n} else if (age < 18) {\n  console.log("مراهق");\n} else if (age <= 30) {\n  console.log("شاب");\n} else {\n  console.log("بالغ");\n}`}
-        hint="ابدأ بالشرط الأصغر (أقل من 13) ثم تدرج للأعلى"
+        instructions="حوّل تصنيف العمر لاستخدام switch/case (باستخدام switch(true)) واطبع: طفل (أقل من 13)، مراهق (13-17)، شاب (18-30)، بالغ (أكبر من 30)."
+        starterCode={`const age = 25;\n\n// استخدم switch(true) مع الحالات\nswitch (true) {\n  case age < 13:\n    console.log("طفل");\n    break;\n  case age < 18:\n    \n    break;\n  case age <= 30:\n    \n    break;\n  default:\n    \n}`}
+        answerCode={`const age = 25;\n\nswitch (true) {\n  case age < 13:\n    console.log("طفل");\n    break;\n  case age < 18:\n    console.log("مراهق");\n    break;\n  case age <= 30:\n    console.log("شاب");\n    break;\n  default:\n    console.log("بالغ");\n}`}
+        hint="في switch(true)، كل case يكون شرطاً منطقياً يعيد true أو false"
         lessonId="js-3"
         exerciseId="free-code"
       />
@@ -413,7 +572,7 @@ const JsConditionalsExercise1: React.FC = () => {
       <StartQuizButton
         lessonId="js-3"
         lessonNum="3"
-        totalQuestions={8}
+        totalQuestions={9}
       />
     </>
   );

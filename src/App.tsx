@@ -133,6 +133,8 @@ const JsArrayMethodsExercise1 = lazyRetry(
 const JsDebuggingExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsDebuggingExercise1'),
 );
+const JsClassroomPage = lazyRetry(() => import('./pages/JsClassroomPage'));
+const JsHomeworkPage = lazyRetry(() => import('./pages/JsHomeworkPage'));
 const QuizPage = lazyRetry(() => import('./features/quiz/QuizPage'));
 
 /* ── Loader for lazy components ── */
@@ -397,6 +399,23 @@ const JsSidebar = ({
   accent: TrackAccent;
 }) => (
   <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 sidebar-scroll">
+    <SidebarSection
+      label="المساحة الصفية 🏫"
+      color={accent.sectionColor}
+    />
+    <SidebarLink
+      to="/js/classroom"
+      label="الخطة الصفية والترتيب"
+      onClick={close}
+      accentBorder={accent.activeBorder}
+    />
+    <SidebarLink
+      to="/js/homework"
+      label="الواجب البرمجي"
+      onClick={close}
+      accentBorder={accent.activeBorder}
+    />
+
     <SidebarSection
       label="الأساسيات 🧱"
       color={accent.sectionColor}
@@ -969,6 +988,34 @@ function App() {
                   <Route
                     index
                     element={<SmartIndexRedirect track="js" />}
+                  />
+
+                  <Route
+                    path="classroom"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonHeader
+                          title="المساحة الصفية في JavaScript"
+                          description="الترتيب بين الطلاب، شجرة التركيز داخل الصف، وشجرة الموضوعات التي نحتاج فهمها جيداً."
+                          color="amber"
+                        />
+                        <JsClassroomPage />
+                      </Suspense>
+                    }
+                  />
+
+                  <Route
+                    path="homework"
+                    element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <LessonHeader
+                          title="الواجب البرمجي"
+                          description="اكتب الكود، اختبره داخل المحرر، ثم أرسله إلى المعلم بعنوان تختاره أنت."
+                          color="amber"
+                        />
+                        <JsHomeworkPage />
+                      </Suspense>
+                    }
                   />
 
                   {/* الأساسيات */}

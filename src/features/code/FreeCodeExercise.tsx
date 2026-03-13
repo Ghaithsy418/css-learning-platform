@@ -4,9 +4,16 @@
  */
 
 import { useState } from 'react';
+import ConsoleOutput from '../js/ConsoleOutput';
 import { useProgress } from '../progress/ProgressContext';
 import { AnswerKey } from './AnswerKey';
 import FreeCodeEditor from './FreeCodeEditor';
+import { runUserJavaScript } from './runUserJavaScript';
+
+type ConsoleLine = {
+  type: 'log' | 'error' | 'info' | 'result';
+  text: string;
+};
 
 interface FreeCodeExerciseProps {
   title: string;
@@ -34,12 +41,22 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
 }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [userCode, setUserCode] = useState(starterCode);
+  const [outputLines, setOutputLines] = useState<ConsoleLine[]>([]);
   const { submitResult, getExerciseResult } = useProgress();
 
   const existingResult =
     lessonId && exerciseId ? getExerciseResult(lessonId, exerciseId) : null;
 
   const isCompleted = completed || !!existingResult;
+
+  const handleRunCode = () => {
+    setOutputLines(runUserJavaScript(userCode));
+  };
+
+  const handleClearOutput = () => {
+    setOutputLines([]);
+  };
 
   const handleComplete = async () => {
     if (!lessonId || !exerciseId || completed) return;
@@ -69,7 +86,31 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
         </div>
       )}
 
-      <FreeCodeEditor defaultCode={starterCode} />
+      <FreeCodeEditor
+        defaultCode={starterCode}
+        onCodeChange={setUserCode}
+      />
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button
+          onClick={handleRunCode}
+          className="px-5 py-2.5 rounded-lg font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+        >
+          ▶ شغّل الكود
+        </button>
+        <button
+          onClick={handleClearOutput}
+          disabled={outputLines.length === 0}
+          className="px-5 py-2.5 rounded-lg font-bold text-sm border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          🧹 مسح النتائج
+        </button>
+      </div>
+
+      <ConsoleOutput
+        lines={outputLines}
+        label="👇 نتيجة تشغيل كودك:"
+      />
 
       <AnswerKey
         show={showAnswer}

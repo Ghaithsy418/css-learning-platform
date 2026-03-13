@@ -2,8 +2,9 @@ import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type {
   ExerciseResult,
+  HomeworkSubmission,
   LessonProgress,
-  SubmitResultPayload,
+  ProgressSubmissionPayload,
   UserProgress,
 } from '../src/types/progress';
 
@@ -21,12 +22,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     !process.env.UPSTASH_REDIS_REST_URL ||
     !process.env.UPSTASH_REDIS_REST_TOKEN
   ) {
-    return res
-      .status(503)
-      .json({
-        error:
-          'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars',
-      });
+    return res.status(503).json({
+      error:
+        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars',
+    });
   }
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
@@ -43,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     /* ── POST /api/progress — save exercise result ── */
     if (req.method === 'POST') {
-      const body = req.body as SubmitResultPayload;
+      const body = req.body as ProgressSubmissionPayload;
       if (!body.userId || !body.lessonId || !body.exerciseId) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
@@ -65,13 +64,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         maxTotalScore: 0,
       };
 
-      const exerciseResult: ExerciseResult = {
-        score: body.score,
-        maxScore: body.maxScore,
-        wrong: body.wrong,
-        answers: body.answers,
-        completedAt: new Date().toISOString(),
-      };
+      let exerciseResult: ExerciseResult;
+
+      if (body.type === 'homework') {
+        const existingExercise = lesson.exercises[body.exerciseId];
+        const nextSubmission: HomeworkSubmission = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          title: body.title,
+          code: body.code,
+          submittedAt: new Date().toISOString(),
+          output: body.output,
+        };
+
+        exerciseResult = {
+          score: existingExercise?.score ?? 0,
+          maxScore: existingExercise?.maxScore ?? 0,
+          wrong: existingExercise?.wrong,
+          answers: existingExercise?.answers,
+          submissions: [
+            ...(existingExercise?.submissions ?? []),
+            nextSubmission,
+          ],
+          completedAt: nextSubmission.submittedAt,
+        };
+      } else {
+        exerciseResult = {
+          score: body.score,
+          maxScore: body.maxScore,
+          wrong: body.wrong,
+          answers: body.answers,
+          completedAt: new Date().toISOString(),
+        };
+      }
 
       lesson.exercises[body.exerciseId] = exerciseResult;
 

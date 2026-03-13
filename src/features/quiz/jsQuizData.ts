@@ -202,6 +202,19 @@ export const jsQuizzes: Record<string, LessonQuizConfig> = {
           'else if تُستخدم لفحص عدة شروط بالترتيب — إذا لم يتحقق الأول يُفحص الثاني وهكذا.',
       },
       {
+        question:
+          'أي صيغة صحيحة لتصنيف العمر باستخدام switch/case بنمط switch(true)؟',
+        options: [
+          'switch (age) { case age < 13: ... }',
+          'switch (true) { case age < 13: console.log("طفل"); break; default: console.log("بالغ"); }',
+          'switch (true) { if (age < 13) ... }',
+          'switch (age < 13) { case age: ... }',
+        ],
+        correctIndex: 1,
+        explanation:
+          'في switch(true)، كل case يكون شرطاً منطقياً مثل age < 13، وعند تحقق الشرط يتم تنفيذ الكود ثم break.',
+      },
+      {
         question: 'أي القيم التالية تُعتبر falsy في JavaScript؟',
         options: ['"hello"', '1', '0', '[]'],
         correctIndex: 2,
