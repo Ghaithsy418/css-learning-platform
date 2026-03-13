@@ -45,7 +45,7 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
 
   const existingResult =
     lessonId && exerciseId ? getExerciseResult(lessonId, exerciseId) : null;
-
+  console.log(answerCode);
   const isCompleted = completed || !!existingResult;
 
   const handleRunCode = () => {
