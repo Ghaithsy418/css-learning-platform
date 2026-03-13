@@ -195,7 +195,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={ifKeyword}
               onChange={setIfKeyword}
               width="w-12"
-              hint="if"
               correctValue="if"
             />{' '}
             (
@@ -203,7 +202,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={condition1}
               onChange={setCondition1}
               width="w-28"
-              hint="age >= 18"
               correctValue="age >= 18"
             />
             ) {'{'}
@@ -218,7 +216,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={elseKeyword}
               onChange={setElseKeyword}
               width="w-14"
-              hint="else"
               correctValue="else"
             />{' '}
             {'{'}
@@ -316,7 +313,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={grade}
               onChange={setGrade}
               width="w-16"
-              hint="85"
               correctValue="85"
             />
             ;
@@ -400,7 +396,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={ternaryOp}
               onChange={setTernaryOp}
               width="w-10"
-              hint="?"
               correctValue="?"
             />{' '}
             <JsString>"بالغ"</JsString> : <JsString>"قاصر"</JsString>;
@@ -474,7 +469,6 @@ const JsConditionalsExercise1: React.FC = () => {
               value={dayNumber}
               onChange={setDayNumber}
               width="w-14"
-              hint="3"
               correctValue="3"
             />
             ;

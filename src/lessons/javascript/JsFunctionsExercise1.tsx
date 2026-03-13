@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { AnswerKey } from '../../features/code/AnswerKey';
 import CodeEditor from '../../features/code/CodeEditor';
 import CodeInput from '../../features/code/CodeInput';
 import CodeLine from '../../features/code/CodeLine';
@@ -32,10 +31,6 @@ const JsFunctionsExercise1: React.FC = () => {
   const [callbackArr, setCallbackArr] = useState('');
   const [callbackMethod, setCallbackMethod] = useState('');
   const [callbackBody, setCallbackBody] = useState('');
-
-  const [showAnswer1, setShowAnswer1] = useState(false);
-  const [showAnswer2, setShowAnswer2] = useState(false);
-  const [showAnswer3, setShowAnswer3] = useState(false);
 
   /* ── Console for exercise 1 ── */
   const console1Lines = useMemo(() => {
@@ -164,7 +159,6 @@ const JsFunctionsExercise1: React.FC = () => {
                 value={funcName}
                 onChange={setFuncName}
                 width="w-24"
-                hint="اسم الدالة"
                 correctValue="greet"
               />
             </JsFunction>
@@ -173,7 +167,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={funcParam}
               onChange={setFuncParam}
               width="w-20"
-              hint="البارمتر"
               correctValue="name"
             />
             ) {'{'}
@@ -184,7 +177,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={funcReturn}
               onChange={setFuncReturn}
               width="w-48"
-              hint="القيمة المُرجعة"
               correctValue="`مرحباً ${name}`"
             />
             ;
@@ -225,37 +217,6 @@ const JsFunctionsExercise1: React.FC = () => {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer1}
-          onToggle={() => setShowAnswer1(!showAnswer1)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              function <strong>greet</strong>(<strong>name</strong>) {'{'}
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              {' '}
-              return <strong>{'`مرحباً ${name}`'}</strong>;
-            </code>
-          </p>
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              {'}'}
-            </code>
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: Arrow Function ═══════ */}
@@ -299,7 +260,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={arrowParam1}
               onChange={setArrowParam1}
               width="w-12"
-              hint="p1"
               correctValue="a"
             />
             ,{' '}
@@ -307,7 +267,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={arrowParam2}
               onChange={setArrowParam2}
               width="w-12"
-              hint="p2"
               correctValue="b"
             />
             ) =&gt;{' '}
@@ -315,7 +274,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={arrowBody}
               onChange={setArrowBody}
               width="w-28"
-              hint="الجمع"
               correctValue="a + b"
             />
             ;
@@ -354,21 +312,6 @@ const JsFunctionsExercise1: React.FC = () => {
             <li>عندما تكون الدالة سطر واحد، يتم إرجاع القيمة تلقائياً</li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer2}
-          onToggle={() => setShowAnswer2(!showAnswer2)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const add = (<strong>a</strong>, <strong>b</strong>) =&gt;{' '}
-              <strong>a + b</strong>;
-            </code>
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: Array Methods with Callbacks ═══════ */}
@@ -423,7 +366,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={callbackArr}
               onChange={setCallbackArr}
               width="w-24"
-              hint="المصفوفة"
               correctValue="numbers"
             />
             .
@@ -432,7 +374,6 @@ const JsFunctionsExercise1: React.FC = () => {
                 value={callbackMethod}
                 onChange={setCallbackMethod}
                 width="w-20"
-                hint="الدالة"
                 correctValue="filter"
               />
             </JsFunction>
@@ -441,7 +382,6 @@ const JsFunctionsExercise1: React.FC = () => {
               value={callbackBody}
               onChange={setCallbackBody}
               width="w-32"
-              hint="الشرط"
               correctValue="n => n > 3"
             />
             );
@@ -477,24 +417,6 @@ const JsFunctionsExercise1: React.FC = () => {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer3}
-          onToggle={() => setShowAnswer3(!showAnswer3)}
-        >
-          <p>
-            <code
-              dir="ltr"
-              className="bg-gray-200 px-2 py-1 rounded font-mono"
-            >
-              const bigNumbers = <strong>numbers</strong>.
-              <strong>filter</strong>(<strong>n =&gt; n &gt; 3</strong>);
-            </code>
-          </p>
-          <p className="mt-2 text-sm text-gray-600">
-            filter تُرجع مصفوفة جديدة تحتوي العناصر التي تحقق الشرط فقط
-          </p>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ تمرين كتابة ═══════ */}

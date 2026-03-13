@@ -6,7 +6,6 @@
 import { useState } from 'react';
 import ConsoleOutput from '../js/ConsoleOutput';
 import { useProgress } from '../progress/ProgressContext';
-import { AnswerKey } from './AnswerKey';
 import FreeCodeEditor from './FreeCodeEditor';
 import { runUserJavaScript } from './runUserJavaScript';
 
@@ -39,7 +38,6 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
   exerciseId,
   maxPoints = 10,
 }) => {
-  const [showAnswer, setShowAnswer] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [userCode, setUserCode] = useState(starterCode);
   const [outputLines, setOutputLines] = useState<ConsoleLine[]>([]);
@@ -111,18 +109,6 @@ const FreeCodeExercise: React.FC<FreeCodeExerciseProps> = ({
         lines={outputLines}
         label="👇 نتيجة تشغيل كودك:"
       />
-
-      <AnswerKey
-        show={showAnswer}
-        onToggle={() => setShowAnswer(!showAnswer)}
-      >
-        <FreeCodeEditor
-          defaultCode={answerCode}
-          language="javascript"
-          readOnly
-          height={220}
-        />
-      </AnswerKey>
 
       {/* Completion tracking */}
       {lessonId && exerciseId && (

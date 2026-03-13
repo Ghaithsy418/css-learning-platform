@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { AnswerKey } from '../../features/code/AnswerKey';
 import CodeEditor from '../../features/code/CodeEditor';
 import CodeInput from '../../features/code/CodeInput';
 import CodeLine from '../../features/code/CodeLine';
@@ -29,10 +28,6 @@ const JsLoopsExercise1: React.FC = () => {
 
   /* ── Exercise 3: for...of ── */
   const [forOfKw, setForOfKw] = useState('');
-
-  const [showAnswer1, setShowAnswer1] = useState(false);
-  const [showAnswer2, setShowAnswer2] = useState(false);
-  const [showAnswer3, setShowAnswer3] = useState(false);
 
   /* ── Console 1 ── */
   const console1Lines = useMemo(() => {
@@ -157,7 +152,6 @@ const JsLoopsExercise1: React.FC = () => {
               value={forInit}
               onChange={setForInit}
               width="w-24"
-              hint="let i = 0"
               correctValue="let i = 0"
             />
             ;{' '}
@@ -165,7 +159,6 @@ const JsLoopsExercise1: React.FC = () => {
               value={forCond}
               onChange={setForCond}
               width="w-16"
-              hint="i < 5"
               correctValue="i < 5"
             />
             ;{' '}
@@ -173,7 +166,6 @@ const JsLoopsExercise1: React.FC = () => {
               value={forUpdate}
               onChange={setForUpdate}
               width="w-14"
-              hint="i++"
               correctValue="i++"
             />
             ) {'{'}
@@ -212,20 +204,6 @@ const JsLoopsExercise1: React.FC = () => {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer1}
-          onToggle={() => setShowAnswer1(!showAnswer1)}
-        >
-          <pre
-            dir="ltr"
-            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
-          >
-            {`for (let i = 0; i < 5; i++) {
-  console.log("العدد:", i);
-}`}
-          </pre>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 2: while loop ═══════ */}
@@ -257,7 +235,6 @@ const JsLoopsExercise1: React.FC = () => {
               value={whileKw}
               onChange={setWhileKw}
               width="w-16"
-              hint="while"
               correctValue="while"
             />{' '}
             (
@@ -265,7 +242,6 @@ const JsLoopsExercise1: React.FC = () => {
               value={whileCond}
               onChange={setWhileCond}
               width="w-24"
-              hint="count < 3"
               correctValue="count < 3"
             />
             ) {'{'}
@@ -279,23 +255,6 @@ const JsLoopsExercise1: React.FC = () => {
         </CodeEditor>
 
         <ConsoleOutput lines={console2Lines} />
-
-        <AnswerKey
-          show={showAnswer2}
-          onToggle={() => setShowAnswer2(!showAnswer2)}
-        >
-          <pre
-            dir="ltr"
-            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
-          >
-            {`let count = 0;
-
-while (count < 3) {
-  console.log("count =", count);
-  count++;
-}`}
-          </pre>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ Exercise 3: for...of ═══════ */}
@@ -329,7 +288,6 @@ while (count < 3) {
               value={forOfKw}
               onChange={setForOfKw}
               width="w-12"
-              hint="of"
               correctValue="of"
             />{' '}
             fruits) {'{'}
@@ -358,20 +316,6 @@ while (count < 3) {
             </li>
           </ul>
         </HintBox>
-
-        <AnswerKey
-          show={showAnswer3}
-          onToggle={() => setShowAnswer3(!showAnswer3)}
-        >
-          <pre
-            dir="ltr"
-            className="bg-gray-200 px-3 py-2 rounded font-mono text-sm"
-          >
-            {`for (const fruit of fruits) {
-  console.log(fruit);
-}`}
-          </pre>
-        </AnswerKey>
       </ExerciseSection>
 
       {/* ═══════ تمرين كتابة ═══════ */}
@@ -380,7 +324,6 @@ while (count < 3) {
         instructions="اكتب حلقة for تطبع جدول الضرب للعدد 7 (من 7×1 إلى 7×10)."
         starterCode={`const number = 7;\n\nfor (let i = 1; i <= 10; i++) {\n  // اطبع نتيجة الضرب\n  console.log();\n}`}
         answerCode={`const number = 7;\n\nfor (let i = 1; i <= 10; i++) {\n  console.log(\`\${number} × \${i} = \${number * i}\`);\n}`}
-        hint="استخدم Template Literal: `${number} × ${i} = ${number * i}`"
         lessonId="js-4"
         exerciseId="free-code"
       />
