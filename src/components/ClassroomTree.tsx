@@ -79,25 +79,64 @@ export default function ClassroomTree({
             </div>
 
             <div className="mt-4 mr-3 space-y-2 border-r-2 border-dashed border-gray-200 pr-4">
-              {topic.lessonIds.map((lessonId) => {
-                const lesson = jsLessonMeta[lessonId];
-                if (!lesson) return null;
+              {/* Separate locked and unlocked lessons */}
+              {(() => {
+                const lessons = topic.lessonIds
+                  .map((lessonId) => {
+                    const lesson = jsLessonMeta[lessonId];
+                    const locked = isLocked(lessonId);
+                    return lesson ? { lessonId, lesson, locked } : null;
+                  })
+                  .filter(
+                    (
+                      item,
+                    ): item is {
+                      lessonId: string;
+                      lesson: { label: string; path: string };
+                      locked: boolean;
+                    } => item !== null,
+                  );
 
-                const locked = isLocked(lessonId);
+                const unlockedLessons = lessons.filter((l) => !l.locked);
+                const lockedLessons = lessons.filter((l) => l.locked);
 
                 return (
-                  <button
-                    key={lessonId}
-                    onClick={() => navigate(lesson.path)}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors ${tone.button} ${locked ? 'opacity-60' : ''}`}
-                  >
-                    <span className="font-medium">{locked ? '🔒' : '📘'}</span>
-                    <span className="text-right text-gray-700">
-                      {lesson.label}
-                    </span>
-                  </button>
+                  <>
+                    {/* Unlocked lessons */}
+                    {unlockedLessons.map(({ lessonId, lesson }) => (
+                      <button
+                        key={lessonId}
+                        onClick={() => navigate(lesson.path)}
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors ${tone.button}`}
+                      >
+                        <span className="font-medium">📘</span>
+                        <span className="text-right text-gray-700">
+                          {lesson.label}
+                        </span>
+                      </button>
+                    ))}
+
+                    {/* Locked lessons section */}
+                    {lockedLessons.length > 0 && unlockedLessons.length > 0 && (
+                      <div className="my-2 border-t border-gray-300"></div>
+                    )}
+
+                    {lockedLessons.map(({ lessonId, lesson }) => (
+                      <button
+                        key={lessonId}
+                        onClick={() => navigate(lesson.path)}
+                        disabled
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors opacity-50 cursor-not-allowed ${tone.button}`}
+                      >
+                        <span className="font-medium">🔒</span>
+                        <span className="text-right text-gray-700">
+                          {lesson.label}
+                        </span>
+                      </button>
+                    ))}
+                  </>
                 );
-              })}
+              })()}
             </div>
           </div>
         ))}

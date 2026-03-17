@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { useLessonLock } from '../features/lessonLock/LessonLockContext';
@@ -1007,6 +1008,7 @@ function HomeworkTab({
     try {
       await onSendTeacherMessage(studentId, submissionId, draft);
       setMessageDrafts((prev) => ({ ...prev, [submissionId]: '' }));
+      toast.success('تم إرسال الرسالة إلى الطالب');
     } catch {
       /* ignore transient update errors */
     }
