@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { useLessonLock } from '../features/lessonLock/LessonLockContext';
-import type { HomeworkSubmission, UserProgress } from '../types/progress';
+import type {
+  HomeworkReaction,
+  HomeworkSubmission,
+  HomeworkTeacherMessage,
+  UserProgress,
+} from '../types/progress';
 
 /* ── Lesson name mapping ── */
 const lessonNames: Record<string, string> = {
@@ -44,6 +49,8 @@ const exerciseNames: Record<string, string> = {
 };
 
 const TRACKED_LESSON_IDS = new Set(Object.keys(lessonNames));
+const HOMEWORK_LESSON_ID = 'js-homework';
+const HOMEWORK_EXERCISE_ID = 'submission-history';
 
 function getTrackedLessonEntries(progress: UserProgress) {
   return Object.entries(progress.lessonResults ?? {}).filter(([lessonId]) =>
@@ -53,8 +60,126 @@ function getTrackedLessonEntries(progress: UserProgress) {
 
 function getHomeworkSubmissionsForStudent(progress: UserProgress) {
   return (
-    progress.lessonResults?.['js-homework']?.exercises?.['submission-history']
-      ?.submissions ?? []
+    progress.lessonResults?.[HOMEWORK_LESSON_ID]?.exercises?.[
+      HOMEWORK_EXERCISE_ID
+    ]?.submissions ?? []
+  );
+}
+
+function createReaction(
+  emoji: string,
+  reactorId: number,
+  reactorName: string,
+): HomeworkReaction {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    emoji,
+    reactorId,
+    reactorName,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function mapHomeworkSubmissions(
+  progress: UserProgress,
+  mapper: (submission: HomeworkSubmission) => HomeworkSubmission,
+): UserProgress {
+  const lesson = progress.lessonResults?.[HOMEWORK_LESSON_ID];
+  const exercise = lesson?.exercises?.[HOMEWORK_EXERCISE_ID];
+  if (!exercise) return progress;
+
+  return {
+    ...progress,
+    lessonResults: {
+      ...progress.lessonResults,
+      [HOMEWORK_LESSON_ID]: {
+        ...lesson,
+        exercises: {
+          ...lesson.exercises,
+          [HOMEWORK_EXERCISE_ID]: {
+            ...exercise,
+            submissions: (exercise.submissions ?? []).map(mapper),
+            completedAt: new Date().toISOString(),
+          },
+        },
+      },
+    },
+    lastUpdated: new Date().toISOString(),
+  };
+}
+
+function addTeacherMessageLocal(
+  progress: UserProgress,
+  submissionId: string,
+  teacherId: number,
+  teacherName: string,
+  message: string,
+): UserProgress {
+  const teacherMessage: HomeworkTeacherMessage = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    teacherId,
+    teacherName,
+    message,
+    createdAt: new Date().toISOString(),
+    reactions: [],
+  };
+
+  return mapHomeworkSubmissions(progress, (submission) =>
+    submission.id === submissionId
+      ? {
+          ...submission,
+          teacherMessages: [
+            ...(submission.teacherMessages ?? []),
+            teacherMessage,
+          ],
+        }
+      : submission,
+  );
+}
+
+function addSubmissionReactionLocal(
+  progress: UserProgress,
+  submissionId: string,
+  emoji: string,
+  reactorId: number,
+  reactorName: string,
+): UserProgress {
+  const reaction = createReaction(emoji, reactorId, reactorName);
+
+  return mapHomeworkSubmissions(progress, (submission) =>
+    submission.id === submissionId
+      ? {
+          ...submission,
+          reactions: [...(submission.reactions ?? []), reaction],
+        }
+      : submission,
+  );
+}
+
+function addTeacherMessageReactionLocal(
+  progress: UserProgress,
+  submissionId: string,
+  messageId: string,
+  emoji: string,
+  reactorId: number,
+  reactorName: string,
+): UserProgress {
+  const reaction = createReaction(emoji, reactorId, reactorName);
+
+  return mapHomeworkSubmissions(progress, (submission) =>
+    submission.id === submissionId
+      ? {
+          ...submission,
+          teacherMessages: (submission.teacherMessages ?? []).map((message) =>
+            message.id === messageId
+              ? {
+                  ...message,
+                  reactions: [...(message.reactions ?? []), reaction],
+                }
+              : message,
+          ),
+        }
+      : submission,
   );
 }
 
@@ -224,6 +349,138 @@ export default function AdminDashboard() {
         new Date(left.submission.submittedAt).getTime(),
     );
 
+  const applyHomeworkAction = async (
+    studentId: number,
+    action:
+      | {
+          type: 'homework-message';
+          submissionId: string;
+          message: string;
+        }
+      | {
+          type: 'homework-reaction';
+          submissionId: string;
+          emoji: string;
+        }
+      | {
+          type: 'homework-message-reaction';
+          submissionId: string;
+          messageId: string;
+          emoji: string;
+        },
+  ) => {
+    if (!user) return;
+
+    const isLocal =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    if (isLocal) {
+      const stored = JSON.parse(
+        localStorage.getItem('ta3allam_progress') ?? '{}',
+      );
+      const existing = stored[studentId];
+      if (!existing) return;
+
+      let updated: UserProgress = existing;
+      if (action.type === 'homework-message') {
+        updated = addTeacherMessageLocal(
+          existing,
+          action.submissionId,
+          user.id,
+          user.name,
+          action.message,
+        );
+      }
+      if (action.type === 'homework-reaction') {
+        updated = addSubmissionReactionLocal(
+          existing,
+          action.submissionId,
+          action.emoji,
+          user.id,
+          user.name,
+        );
+      }
+      if (action.type === 'homework-message-reaction') {
+        updated = addTeacherMessageReactionLocal(
+          existing,
+          action.submissionId,
+          action.messageId,
+          action.emoji,
+          user.id,
+          user.name,
+        );
+      }
+
+      stored[studentId] = updated;
+      localStorage.setItem('ta3allam_progress', JSON.stringify(stored));
+      setAllProgress((prev) =>
+        prev.map((entry) =>
+          entry.userId === studentId
+            ? {
+                ...entry,
+                lessonResults: updated.lessonResults,
+                totalPoints: updated.totalPoints,
+                lastUpdated: updated.lastUpdated,
+              }
+            : entry,
+        ),
+      );
+      return;
+    }
+
+    const body =
+      action.type === 'homework-message'
+        ? {
+            type: 'homework-message' as const,
+            userId: studentId,
+            submissionId: action.submissionId,
+            teacherId: user.id,
+            teacherName: user.name,
+            message: action.message,
+          }
+        : action.type === 'homework-reaction'
+          ? {
+              type: 'homework-reaction' as const,
+              userId: studentId,
+              submissionId: action.submissionId,
+              reactorId: user.id,
+              reactorName: user.name,
+              emoji: action.emoji,
+            }
+          : {
+              type: 'homework-message-reaction' as const,
+              userId: studentId,
+              submissionId: action.submissionId,
+              messageId: action.messageId,
+              reactorId: user.id,
+              reactorName: user.name,
+              emoji: action.emoji,
+            };
+
+    const response = await fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update homework interaction');
+    }
+    const updated: UserProgress = await response.json();
+    setAllProgress((prev) =>
+      prev.map((entry) =>
+        entry.userId === studentId
+          ? {
+              ...entry,
+              lessonResults: updated.lessonResults,
+              totalPoints: updated.totalPoints,
+              lastUpdated: updated.lastUpdated,
+            }
+          : entry,
+      ),
+    );
+  };
+
   return (
     <div
       className="min-h-screen"
@@ -301,7 +558,36 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'homework' && (
-          <HomeworkTab submissions={homeworkSubmissions} />
+          <HomeworkTab
+            submissions={homeworkSubmissions}
+            onSendTeacherMessage={(studentId, submissionId, message) =>
+              applyHomeworkAction(studentId, {
+                type: 'homework-message',
+                submissionId,
+                message,
+              })
+            }
+            onReactToHomework={(studentId, submissionId, emoji) =>
+              applyHomeworkAction(studentId, {
+                type: 'homework-reaction',
+                submissionId,
+                emoji,
+              })
+            }
+            onReactToTeacherMessage={(
+              studentId,
+              submissionId,
+              messageId,
+              emoji,
+            ) =>
+              applyHomeworkAction(studentId, {
+                type: 'homework-message-reaction',
+                submissionId,
+                messageId,
+                emoji,
+              })
+            }
+          />
         )}
 
         {/* ═══ STUDENTS TAB ═══ */}
@@ -676,13 +962,56 @@ function StudentRow({
 
 function HomeworkTab({
   submissions,
+  onSendTeacherMessage,
+  onReactToHomework,
+  onReactToTeacherMessage,
 }: {
   submissions: {
     studentId: number;
     studentName: string;
     submission: HomeworkSubmission;
   }[];
+  onSendTeacherMessage: (
+    studentId: number,
+    submissionId: string,
+    message: string,
+  ) => Promise<void>;
+  onReactToHomework: (
+    studentId: number,
+    submissionId: string,
+    emoji: string,
+  ) => Promise<void>;
+  onReactToTeacherMessage: (
+    studentId: number,
+    submissionId: string,
+    messageId: string,
+    emoji: string,
+  ) => Promise<void>;
 }) {
+  const [messageDrafts, setMessageDrafts] = useState<Record<string, string>>(
+    {},
+  );
+  const reactionOptions = ['❤️', '👏', '🔥', '✅', '💡'];
+
+  const countByEmoji = (items: { emoji: string }[] = []) => {
+    return items.reduce<Record<string, number>>((acc, item) => {
+      acc[item.emoji] = (acc[item.emoji] ?? 0) + 1;
+      return acc;
+    }, {});
+  };
+
+  const handleSendMessage = async (studentId: number, submissionId: string) => {
+    const draft = messageDrafts[submissionId]?.trim();
+    if (!draft) return;
+
+    try {
+      await onSendTeacherMessage(studentId, submissionId, draft);
+      setMessageDrafts((prev) => ({ ...prev, [submissionId]: '' }));
+    } catch {
+      /* ignore transient update errors */
+    }
+  };
+
   if (submissions.length === 0) {
     return (
       <div className="text-center py-20 text-gray-500">
@@ -722,6 +1051,128 @@ function HomeworkTab({
           >
             {submission.code}
           </pre>
+
+          <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+            <p className="text-right text-xs font-bold text-gray-400">
+              التفاعل على الواجب
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {reactionOptions.map((emoji) => (
+                <button
+                  key={`${submission.id}-${emoji}`}
+                  onClick={() => {
+                    void onReactToHomework(studentId, submission.id, emoji);
+                  }}
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm text-white hover:bg-white/10"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            {submission.reactions && submission.reactions.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {Object.entries(countByEmoji(submission.reactions)).map(
+                  ([emoji, count]) => (
+                    <span
+                      key={`${submission.id}-reaction-${emoji}`}
+                      className="rounded-full bg-amber-500/20 px-2.5 py-1 text-xs font-bold text-amber-200"
+                    >
+                      {emoji} {count}
+                    </span>
+                  ),
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <p className="text-right text-sm font-bold text-emerald-200">
+              رسالة مخصصة لهذا الواجب
+            </p>
+            <div className="mt-3 flex flex-col gap-3">
+              <textarea
+                value={messageDrafts[submission.id] ?? ''}
+                onChange={(event) =>
+                  setMessageDrafts((prev) => ({
+                    ...prev,
+                    [submission.id]: event.target.value,
+                  }))
+                }
+                rows={3}
+                placeholder="اكتب رسالة تشجيعية أو ملاحظة مفيدة للطالب"
+                className="w-full rounded-lg border border-emerald-400/30 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none focus:border-emerald-400"
+              />
+              <button
+                onClick={() => handleSendMessage(studentId, submission.id)}
+                className="self-start rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-black hover:bg-emerald-400"
+              >
+                إرسال رسالة للطالب
+              </button>
+            </div>
+          </div>
+
+          {submission.teacherMessages &&
+            submission.teacherMessages.length > 0 && (
+              <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
+                <p className="text-right text-xs font-bold text-gray-400">
+                  سجل رسائل المعلم
+                </p>
+                <div className="mt-3 space-y-3">
+                  {submission.teacherMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className="rounded-lg border border-white/10 bg-black/20 p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.createdAt).toLocaleString('ar-SA')}
+                        </span>
+                        <p className="text-sm font-bold text-emerald-300">
+                          {message.teacherName}
+                        </p>
+                      </div>
+                      <p className="mt-2 text-right text-sm text-gray-200">
+                        {message.message}
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {reactionOptions.map((emoji) => (
+                          <button
+                            key={`${message.id}-${emoji}`}
+                            onClick={() => {
+                              void onReactToTeacherMessage(
+                                studentId,
+                                submission.id,
+                                message.id,
+                                emoji,
+                              );
+                            }}
+                            className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-200 hover:bg-emerald-500/20"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+
+                      {message.reactions && message.reactions.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {Object.entries(countByEmoji(message.reactions)).map(
+                            ([emoji, count]) => (
+                              <span
+                                key={`${message.id}-reaction-${emoji}`}
+                                className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-bold text-emerald-100"
+                              >
+                                {emoji} {count}
+                              </span>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
           {submission.output && submission.output.length > 0 && (
             <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">

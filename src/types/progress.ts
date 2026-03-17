@@ -17,12 +17,31 @@ export interface HomeworkOutputLine {
   text: string;
 }
 
+export interface HomeworkReaction {
+  id: string;
+  emoji: string;
+  reactorId: number;
+  reactorName: string;
+  createdAt: string;
+}
+
+export interface HomeworkTeacherMessage {
+  id: string;
+  teacherId: number;
+  teacherName: string;
+  message: string;
+  createdAt: string;
+  reactions?: HomeworkReaction[];
+}
+
 export interface HomeworkSubmission {
   id: string;
   title: string;
   code: string;
   submittedAt: string;
   output?: HomeworkOutputLine[];
+  reactions?: HomeworkReaction[];
+  teacherMessages?: HomeworkTeacherMessage[];
 }
 
 export interface LessonProgress {
@@ -62,6 +81,34 @@ export interface SubmitHomeworkPayload {
   output?: HomeworkOutputLine[];
 }
 
+export interface AddHomeworkTeacherMessagePayload {
+  type: 'homework-message';
+  userId: number;
+  submissionId: string;
+  teacherId: number;
+  teacherName: string;
+  message: string;
+}
+
+export interface AddHomeworkReactionPayload {
+  type: 'homework-reaction';
+  userId: number;
+  submissionId: string;
+  reactorId: number;
+  reactorName: string;
+  emoji: string;
+}
+
+export interface AddHomeworkMessageReactionPayload {
+  type: 'homework-message-reaction';
+  userId: number;
+  submissionId: string;
+  messageId: string;
+  reactorId: number;
+  reactorName: string;
+  emoji: string;
+}
+
 export interface LeaderboardEntry {
   userId: number;
   userName: string;
@@ -71,4 +118,7 @@ export interface LeaderboardEntry {
 
 export type ProgressSubmissionPayload =
   | SubmitResultPayload
-  | SubmitHomeworkPayload;
+  | SubmitHomeworkPayload
+  | AddHomeworkTeacherMessagePayload
+  | AddHomeworkReactionPayload
+  | AddHomeworkMessageReactionPayload;

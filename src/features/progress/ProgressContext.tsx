@@ -13,8 +13,11 @@ import {
   type ReactNode,
 } from 'react';
 import type {
+  AddHomeworkMessageReactionPayload,
+  AddHomeworkReactionPayload,
   ExerciseResult,
   HomeworkOutputLine,
+  HomeworkReaction,
   HomeworkSubmission,
   LessonProgress,
   SubmitHomeworkPayload,
@@ -48,6 +51,12 @@ interface ProgressState {
     output?: HomeworkOutputLine[],
   ) => Promise<void>;
   getHomeworkSubmissions: () => HomeworkSubmission[];
+  reactToHomework: (submissionId: string, emoji: string) => Promise<void>;
+  reactToTeacherMessage: (
+    submissionId: string,
+    messageId: string,
+    emoji: string,
+  ) => Promise<void>;
   totalPoints: number;
 }
 
@@ -90,6 +99,20 @@ function createEmptyProgress(userId: number, userName: string): UserProgress {
     lessonResults: {},
     totalPoints: 0,
     lastUpdated: '',
+  };
+}
+
+function createReaction(
+  emoji: string,
+  reactorId: number,
+  reactorName: string,
+): HomeworkReaction {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    emoji,
+    reactorId,
+    reactorName,
+    createdAt: new Date().toISOString(),
   };
 }
 
@@ -368,6 +391,168 @@ export const ProgressProvider: React.FC<{ children: ReactNode }> = ({
 
   const totalPoints = progress?.totalPoints ?? 0;
 
+  const reactToHomework = useCallback(
+    async (submissionId: string, emoji: string) => {
+      if (!user) return;
+
+      const payload: AddHomeworkReactionPayload = {
+        type: 'homework-reaction',
+        userId: user.id,
+        submissionId,
+        reactorId: user.id,
+        reactorName: user.name,
+        emoji,
+      };
+
+      try {
+        if (isApiAvailable()) {
+          const res = await fetch('/api/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            const updated: UserProgress = await res.json();
+            const normalized = normalizeProgress(updated, user.id, user.name);
+            setProgress(normalized);
+            saveLocalProgress(user.id, normalized);
+            return;
+          }
+        }
+      } catch {
+        /* fall through to localStorage */
+      }
+
+      const existing = normalizeProgress(progress, user.id, user.name);
+      const lesson = existing.lessonResults[HOMEWORK_LESSON_ID] ?? {
+        exercises: {},
+        totalScore: 0,
+        maxTotalScore: 0,
+      };
+      const exercise = lesson.exercises[HOMEWORK_EXERCISE_ID];
+      if (!exercise) return;
+
+      const reaction = createReaction(emoji, user.id, user.name);
+      const updatedLesson = recalculateLesson({
+        ...lesson,
+        exercises: {
+          ...lesson.exercises,
+          [HOMEWORK_EXERCISE_ID]: {
+            ...exercise,
+            submissions: (exercise.submissions ?? []).map((submission) =>
+              submission.id === submissionId
+                ? {
+                    ...submission,
+                    reactions: [...(submission.reactions ?? []), reaction],
+                  }
+                : submission,
+            ),
+            completedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      const updatedProgress = recalculateProgress({
+        ...existing,
+        lessonResults: {
+          ...existing.lessonResults,
+          [HOMEWORK_LESSON_ID]: updatedLesson,
+        },
+      });
+
+      setProgress(updatedProgress);
+      saveLocalProgress(user.id, updatedProgress);
+    },
+    [user, progress],
+  );
+
+  const reactToTeacherMessage = useCallback(
+    async (submissionId: string, messageId: string, emoji: string) => {
+      if (!user) return;
+
+      const payload: AddHomeworkMessageReactionPayload = {
+        type: 'homework-message-reaction',
+        userId: user.id,
+        submissionId,
+        messageId,
+        reactorId: user.id,
+        reactorName: user.name,
+        emoji,
+      };
+
+      try {
+        if (isApiAvailable()) {
+          const res = await fetch('/api/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            const updated: UserProgress = await res.json();
+            const normalized = normalizeProgress(updated, user.id, user.name);
+            setProgress(normalized);
+            saveLocalProgress(user.id, normalized);
+            return;
+          }
+        }
+      } catch {
+        /* fall through to localStorage */
+      }
+
+      const existing = normalizeProgress(progress, user.id, user.name);
+      const lesson = existing.lessonResults[HOMEWORK_LESSON_ID] ?? {
+        exercises: {},
+        totalScore: 0,
+        maxTotalScore: 0,
+      };
+      const exercise = lesson.exercises[HOMEWORK_EXERCISE_ID];
+      if (!exercise) return;
+
+      const reaction = createReaction(emoji, user.id, user.name);
+      const updatedLesson = recalculateLesson({
+        ...lesson,
+        exercises: {
+          ...lesson.exercises,
+          [HOMEWORK_EXERCISE_ID]: {
+            ...exercise,
+            submissions: (exercise.submissions ?? []).map((submission) =>
+              submission.id === submissionId
+                ? {
+                    ...submission,
+                    teacherMessages: (submission.teacherMessages ?? []).map(
+                      (message) =>
+                        message.id === messageId
+                          ? {
+                              ...message,
+                              reactions: [
+                                ...(message.reactions ?? []),
+                                reaction,
+                              ],
+                            }
+                          : message,
+                    ),
+                  }
+                : submission,
+            ),
+            completedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      const updatedProgress = recalculateProgress({
+        ...existing,
+        lessonResults: {
+          ...existing.lessonResults,
+          [HOMEWORK_LESSON_ID]: updatedLesson,
+        },
+      });
+
+      setProgress(updatedProgress);
+      saveLocalProgress(user.id, updatedProgress);
+    },
+    [user, progress],
+  );
+
   const getHomeworkSubmissions = useCallback((): HomeworkSubmission[] => {
     const submissions =
       progress?.lessonResults[HOMEWORK_LESSON_ID]?.exercises[
@@ -389,6 +574,8 @@ export const ProgressProvider: React.FC<{ children: ReactNode }> = ({
       submitHomework,
       getExerciseResult,
       getHomeworkSubmissions,
+      reactToHomework,
+      reactToTeacherMessage,
       totalPoints,
     }),
     [
@@ -398,6 +585,8 @@ export const ProgressProvider: React.FC<{ children: ReactNode }> = ({
       submitHomework,
       getExerciseResult,
       getHomeworkSubmissions,
+      reactToHomework,
+      reactToTeacherMessage,
       totalPoints,
     ],
   );

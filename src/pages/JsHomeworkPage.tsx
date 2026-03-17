@@ -25,7 +25,14 @@ export default function JsHomeworkPage() {
     runUserJavaScript(starterCode),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { submitHomework, getHomeworkSubmissions } = useProgress();
+  const {
+    submitHomework,
+    getHomeworkSubmissions,
+    reactToHomework,
+    reactToTeacherMessage,
+  } = useProgress();
+
+  const reactionOptions = ['❤️', '👏', '🔥', '✅', '🤝'];
 
   const submissions = getHomeworkSubmissions();
 
@@ -58,6 +65,36 @@ export default function JsHomeworkPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleHomeworkReaction = async (
+    submissionId: string,
+    emoji: string,
+  ) => {
+    try {
+      await reactToHomework(submissionId, emoji);
+    } catch {
+      toast.error('تعذر إضافة التفاعل حالياً');
+    }
+  };
+
+  const handleTeacherMessageReaction = async (
+    submissionId: string,
+    messageId: string,
+    emoji: string,
+  ) => {
+    try {
+      await reactToTeacherMessage(submissionId, messageId, emoji);
+    } catch {
+      toast.error('تعذر إضافة التفاعل على رسالة المعلم');
+    }
+  };
+
+  const countByEmoji = (items: { emoji: string }[] = []) => {
+    return items.reduce<Record<string, number>>((acc, item) => {
+      acc[item.emoji] = (acc[item.emoji] ?? 0) + 1;
+      return acc;
+    }, {});
   };
 
   return (
@@ -165,6 +202,102 @@ export default function JsHomeworkPage() {
                 >
                   {submission.code}
                 </pre>
+
+                <div className="mt-4 rounded-xl border border-gray-200 bg-white p-3">
+                  <p className="text-right text-xs font-bold text-gray-500">
+                    التفاعل على الواجب
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {reactionOptions.map((emoji) => (
+                      <button
+                        key={`${submission.id}-${emoji}`}
+                        onClick={() =>
+                          handleHomeworkReaction(submission.id, emoji)
+                        }
+                        className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm hover:bg-gray-100"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  {submission.reactions && submission.reactions.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {Object.entries(countByEmoji(submission.reactions)).map(
+                        ([emoji, count]) => (
+                          <span
+                            key={`${submission.id}-count-${emoji}`}
+                            className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900"
+                          >
+                            {emoji} {count}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {submission.teacherMessages &&
+                  submission.teacherMessages.length > 0 && (
+                    <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                      <p className="text-right text-sm font-bold text-emerald-800">
+                        رسائل المعلم
+                      </p>
+                      <div className="mt-3 space-y-3">
+                        {submission.teacherMessages.map((message) => (
+                          <div
+                            key={message.id}
+                            className="rounded-lg border border-emerald-200 bg-white p-3"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="text-xs text-emerald-700">
+                                {new Date(message.createdAt).toLocaleString(
+                                  'ar-SA',
+                                )}
+                              </span>
+                              <p className="text-sm font-bold text-emerald-900">
+                                {message.teacherName}
+                              </p>
+                            </div>
+                            <p className="mt-2 text-right text-sm text-gray-700">
+                              {message.message}
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {reactionOptions.map((emoji) => (
+                                <button
+                                  key={`${message.id}-${emoji}`}
+                                  onClick={() =>
+                                    handleTeacherMessageReaction(
+                                      submission.id,
+                                      message.id,
+                                      emoji,
+                                    )
+                                  }
+                                  className="rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-sm hover:bg-emerald-200"
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                            {message.reactions &&
+                              message.reactions.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {Object.entries(
+                                    countByEmoji(message.reactions),
+                                  ).map(([emoji, count]) => (
+                                    <span
+                                      key={`${message.id}-count-${emoji}`}
+                                      className="rounded-full bg-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-900"
+                                    >
+                                      {emoji} {count}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </article>
             ))}
           </div>

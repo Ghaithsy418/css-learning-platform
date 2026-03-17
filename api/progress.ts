@@ -1,14 +1,28 @@
 import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type {
+  AddHomeworkMessageReactionPayload,
+  AddHomeworkReactionPayload,
+  AddHomeworkTeacherMessagePayload,
   ExerciseResult,
+  HomeworkReaction,
   HomeworkSubmission,
+  HomeworkTeacherMessage,
   LessonProgress,
   ProgressSubmissionPayload,
   UserProgress,
 } from '../src/types/progress';
 
 const redis = Redis.fromEnv();
+const HOMEWORK_LESSON_ID = 'js-homework';
+const HOMEWORK_EXERCISE_ID = 'submission-history';
+
+function pushReaction(
+  existing: HomeworkReaction[] | undefined,
+  reaction: HomeworkReaction,
+) {
+  return [...(existing ?? []), reaction];
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -43,7 +57,131 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     /* ── POST /api/progress — save exercise result ── */
     if (req.method === 'POST') {
       const body = req.body as ProgressSubmissionPayload;
-      if (!body.userId || !body.lessonId || !body.exerciseId) {
+      if (!body.userId) {
+        return res.status(400).json({ error: 'Missing userId' });
+      }
+
+      if (
+        body.type === 'homework-message' ||
+        body.type === 'homework-reaction' ||
+        body.type === 'homework-message-reaction'
+      ) {
+        const lessonId = HOMEWORK_LESSON_ID;
+        const exerciseId = HOMEWORK_EXERCISE_ID;
+        const key = `progress:${body.userId}`;
+        const existing = (await redis.get<UserProgress>(key)) ?? {
+          userId: body.userId,
+          userName: '',
+          lessonResults: {},
+          totalPoints: 0,
+          lastUpdated: '',
+        };
+
+        const lesson: LessonProgress = existing.lessonResults[lessonId] ?? {
+          exercises: {},
+          totalScore: 0,
+          maxTotalScore: 0,
+        };
+
+        const exercise = lesson.exercises[exerciseId];
+        if (!exercise?.submissions?.length) {
+          return res
+            .status(404)
+            .json({ error: 'Homework submission not found' });
+        }
+
+        const nextSubmissions = exercise.submissions.map((submission) => {
+          if (submission.id !== body.submissionId) {
+            return submission;
+          }
+
+          if (body.type === 'homework-message') {
+            const msgPayload = body as AddHomeworkTeacherMessagePayload;
+            const teacherMessage: HomeworkTeacherMessage = {
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+              teacherId: msgPayload.teacherId,
+              teacherName: msgPayload.teacherName,
+              message: msgPayload.message,
+              createdAt: new Date().toISOString(),
+              reactions: [],
+            };
+
+            return {
+              ...submission,
+              teacherMessages: [
+                ...(submission.teacherMessages ?? []),
+                teacherMessage,
+              ],
+            };
+          }
+
+          if (body.type === 'homework-reaction') {
+            const reactionPayload = body as AddHomeworkReactionPayload;
+            const reaction: HomeworkReaction = {
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+              emoji: reactionPayload.emoji,
+              reactorId: reactionPayload.reactorId,
+              reactorName: reactionPayload.reactorName,
+              createdAt: new Date().toISOString(),
+            };
+            return {
+              ...submission,
+              reactions: pushReaction(submission.reactions, reaction),
+            };
+          }
+
+          const messageReactionPayload =
+            body as AddHomeworkMessageReactionPayload;
+          const reaction: HomeworkReaction = {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            emoji: messageReactionPayload.emoji,
+            reactorId: messageReactionPayload.reactorId,
+            reactorName: messageReactionPayload.reactorName,
+            createdAt: new Date().toISOString(),
+          };
+
+          return {
+            ...submission,
+            teacherMessages: (submission.teacherMessages ?? []).map(
+              (message) =>
+                message.id === messageReactionPayload.messageId
+                  ? {
+                      ...message,
+                      reactions: pushReaction(message.reactions, reaction),
+                    }
+                  : message,
+            ),
+          };
+        });
+
+        lesson.exercises[exerciseId] = {
+          ...exercise,
+          submissions: nextSubmissions,
+          completedAt: new Date().toISOString(),
+        };
+
+        lesson.totalScore = Object.values(lesson.exercises).reduce(
+          (sum, e) => sum + e.score,
+          0,
+        );
+        lesson.maxTotalScore = Object.values(lesson.exercises).reduce(
+          (sum, e) => sum + e.maxScore,
+          0,
+        );
+
+        existing.lessonResults[lessonId] = lesson;
+        existing.totalPoints = Object.values(existing.lessonResults).reduce(
+          (sum, l) => sum + l.totalScore,
+          0,
+        );
+        existing.lastUpdated = new Date().toISOString();
+
+        await redis.set(key, existing);
+        await redis.sadd('progress:user_ids', body.userId);
+        return res.json(existing);
+      }
+
+      if (!body.lessonId || !body.exerciseId) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
