@@ -14,7 +14,9 @@ export default function NotificationManager() {
       return;
     }
 
-    void registerForPushNotifications(user.id);
+    void registerForPushNotifications(user.id).catch((error) => {
+      console.error('Push notification registration failed:', error);
+    });
 
     let unsubscribe: (() => void) | undefined;
 

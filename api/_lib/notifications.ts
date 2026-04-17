@@ -63,15 +63,37 @@ function getFirebaseAdminApp() {
   });
 }
 
+function normalizePublicEnvValue(raw: unknown) {
+  if (typeof raw !== 'string') return undefined;
+
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+
+  return trimmed;
+}
+
 export function getPublicFirebaseConfig() {
+  const vapid = normalizePublicEnvValue(process.env.VITE_FIREBASE_VAPID_KEY);
+
   return {
-    apiKey: process.env.VITE_FIREBASE_API_KEY,
-    authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.VITE_FIREBASE_APP_ID,
-    vapidKey: process.env.VITE_FIREBASE_VAPID_KEY,
+    apiKey: normalizePublicEnvValue(process.env.VITE_FIREBASE_API_KEY),
+    authDomain: normalizePublicEnvValue(process.env.VITE_FIREBASE_AUTH_DOMAIN),
+    projectId: normalizePublicEnvValue(process.env.VITE_FIREBASE_PROJECT_ID),
+    storageBucket: normalizePublicEnvValue(
+      process.env.VITE_FIREBASE_STORAGE_BUCKET,
+    ),
+    messagingSenderId: normalizePublicEnvValue(
+      process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    ),
+    appId: normalizePublicEnvValue(process.env.VITE_FIREBASE_APP_ID),
+    vapidKey: vapid?.replace(/\s+/g, ''),
   };
 }
 
