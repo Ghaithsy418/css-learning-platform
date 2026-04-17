@@ -12,4 +12,15 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  server: {
+    // In local development, route API calls to `vercel dev` so
+    // `/api/*` executes serverless handlers instead of being served as source files.
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

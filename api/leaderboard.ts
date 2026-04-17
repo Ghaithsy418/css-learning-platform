@@ -5,6 +5,7 @@ import type { LeaderboardEntry, UserProgress } from '../src/types/progress';
 import {
   getRedisClient,
   getRedisConfigurationErrorMessage,
+  isRedisAuthOrConfigError,
 } from './_lib/redis';
 
 interface UserRecord {
@@ -90,6 +91,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json(leaderboard);
   } catch (error) {
     console.error('Leaderboard API error:', error);
+    if (isRedisAuthOrConfigError(error)) {
+      return res.status(503).json({
+        error:
+          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
+      });
+    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

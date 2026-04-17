@@ -73,10 +73,15 @@ const LessonLockContext = createContext<LessonLockState>({
 
 export const useLessonLock = () => useContext(LessonLockContext);
 
-const isLocal =
+const FORCE_REMOTE_API_IN_LOCAL =
+  import.meta.env.VITE_USE_REMOTE_API_IN_LOCAL === 'true';
+
+const isLocalHost =
   typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1');
+
+const useLocalFallback = isLocalHost && !FORCE_REMOTE_API_IN_LOCAL;
 
 export function LessonLockProvider({ children }: { children: ReactNode }) {
   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
@@ -89,7 +94,7 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
 
   const fetchLocks = useCallback(async () => {
     try {
-      if (isLocal) {
+      if (useLocalFallback) {
         const raw = localStorage.getItem('ta3allam_locked_lessons');
         setLockedLessons(raw ? JSON.parse(raw) : []);
       } else {

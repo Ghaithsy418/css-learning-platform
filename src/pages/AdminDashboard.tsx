@@ -64,6 +64,16 @@ const exerciseNames: Record<string, string> = {
 const TRACKED_LESSON_IDS = new Set(Object.keys(lessonNames));
 const HOMEWORK_LESSON_ID = 'js-homework';
 const HOMEWORK_EXERCISE_ID = 'submission-history';
+const FORCE_REMOTE_API_IN_LOCAL =
+  import.meta.env.VITE_USE_REMOTE_API_IN_LOCAL === 'true';
+
+function shouldUseLocalAdminFallback() {
+  return (
+    !FORCE_REMOTE_API_IN_LOCAL &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1')
+  );
+}
 
 function getTrackedLessonEntries(progress: UserProgress) {
   return Object.entries(progress.lessonResults ?? {}).filter(([lessonId]) =>
@@ -219,9 +229,7 @@ export default function AdminDashboard() {
 
     const fetchProgress = async () => {
       try {
-        const isLocal =
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1';
+        const isLocal = shouldUseLocalAdminFallback();
 
         if (isLocal) {
           // Local dev — read from localStorage, cross-ref with users.json
@@ -269,9 +277,7 @@ export default function AdminDashboard() {
     // Fetch lesson locks
     const fetchLocks = async () => {
       try {
-        const isLocal =
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1';
+        const isLocal = shouldUseLocalAdminFallback();
         if (isLocal) {
           const stored = JSON.parse(
             localStorage.getItem('ta3allam_locked_lessons') ?? '[]',
@@ -298,9 +304,7 @@ export default function AdminDashboard() {
     setLockLoading(lessonId);
 
     try {
-      const isLocal =
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
+      const isLocal = shouldUseLocalAdminFallback();
 
       if (isLocal) {
         const newLocked = isLocked
@@ -384,9 +388,7 @@ export default function AdminDashboard() {
   ) => {
     if (!user) return;
 
-    const isLocal =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
+    const isLocal = shouldUseLocalAdminFallback();
 
     if (isLocal) {
       const stored = JSON.parse(

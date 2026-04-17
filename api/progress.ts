@@ -1,4 +1,3 @@
-import type { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type {
   AddHomeworkMessageReactionPayload,
@@ -13,13 +12,9 @@ import type {
   UserProgress,
 } from '../src/types/progress';
 import {
-  getUserById,
-  sendNotificationToRole,
-  sendNotificationToUsers,
-} from './_lib/notifications';
-import {
   getRedisClient,
   getRedisConfigurationErrorMessage,
+  isRedisAuthOrConfigError,
 } from './_lib/redis';
 const HOMEWORK_LESSON_ID = 'js-homework';
 const HOMEWORK_EXERCISE_ID = 'submission-history';
@@ -29,25 +24,6 @@ function pushReaction(
   reaction: HomeworkReaction,
 ) {
   return [...(existing ?? []), reaction];
-}
-
-async function notifyStudentAboutHomeworkInteraction(
-  redis: Redis,
-  userId: number,
-  title: string,
-  body: string,
-  data: Record<string, string>,
-) {
-  try {
-    await sendNotificationToUsers(redis, [userId], {
-      title,
-      body,
-      link: '/js/homework',
-      data,
-    });
-  } catch (notificationError) {
-    console.error('Student homework notification error:', notificationError);
-  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -199,57 +175,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await redis.set(key, existing);
         await redis.sadd('progress:user_ids', body.userId);
 
-        if (body.type === 'homework-message') {
-          const messagePayload = body as AddHomeworkTeacherMessagePayload;
-          await notifyStudentAboutHomeworkInteraction(
-            redis,
-            body.userId,
-            'رسالة جديدة من المعلم',
-            messagePayload.message,
-            {
-              eventType: 'homework-message',
-              submissionId: body.submissionId,
-            },
-          );
-        }
-
-        if (body.type === 'homework-reaction') {
-          const reactionPayload = body as AddHomeworkReactionPayload;
-          const reactor = getUserById(reactionPayload.reactorId);
-          if (reactor?.role === 'admin') {
-            await notifyStudentAboutHomeworkInteraction(
-              redis,
-              body.userId,
-              'تفاعل جديد من المعلم',
-              `${reactionPayload.reactorName} تفاعل على واجبك ${reactionPayload.emoji}`,
-              {
-                eventType: 'homework-reaction',
-                submissionId: body.submissionId,
-                emoji: reactionPayload.emoji,
-              },
-            );
-          }
-        }
-
-        if (body.type === 'homework-message-reaction') {
-          const reactionPayload = body as AddHomeworkMessageReactionPayload;
-          const reactor = getUserById(reactionPayload.reactorId);
-          if (reactor?.role === 'admin') {
-            await notifyStudentAboutHomeworkInteraction(
-              redis,
-              body.userId,
-              'تفاعل جديد على رسالة المعلم',
-              `${reactionPayload.reactorName} تفاعل على الرسالة ${reactionPayload.emoji}`,
-              {
-                eventType: 'homework-message-reaction',
-                submissionId: body.submissionId,
-                messageId: reactionPayload.messageId,
-                emoji: reactionPayload.emoji,
-              },
-            );
-          }
-        }
-
         return res.json(existing);
       }
 
@@ -334,32 +259,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Track this user ID in the index
       await redis.sadd('progress:user_ids', body.userId);
 
-      if (body.type === 'homework') {
-        try {
-          await sendNotificationToRole(redis, 'admin', {
-            title: 'تم إرسال واجب جديد',
-            body: `${body.userName} أرسل واجباً بعنوان ${body.title}`,
-            link: '/admin',
-            data: {
-              eventType: 'homework-submitted',
-              studentId: String(body.userId),
-              title: body.title,
-            },
-          });
-        } catch (notificationError) {
-          console.error(
-            'Homework submit notification error:',
-            notificationError,
-          );
-        }
-      }
-
       return res.json(existing);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('Progress API error:', err);
+    if (isRedisAuthOrConfigError(err)) {
+      return res.status(503).json({
+        error:
+          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
+      });
+    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -3,6 +3,10 @@ import { useAuth } from '../features/auth/AuthContext';
 import type { LeaderboardEntry } from '../types/progress';
 
 function isLocalMode() {
+  if (import.meta.env.VITE_USE_REMOTE_API_IN_LOCAL === 'true') {
+    return false;
+  }
+
   return (
     window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1'

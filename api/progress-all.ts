@@ -5,6 +5,7 @@ import type { UserProgress } from '../src/types/progress';
 import {
   getRedisClient,
   getRedisConfigurationErrorMessage,
+  isRedisAuthOrConfigError,
 } from './_lib/redis';
 
 interface UserRecord {
@@ -86,10 +87,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json(allProgress);
   } catch (err: any) {
     console.error('Progress-all API error:', err);
-    if (err?.message?.includes('permission') || err?.code === 403) {
+    if (isRedisAuthOrConfigError(err)) {
       return res.status(503).json({
         error:
-          'Redis auth failed — verify your token/URL pair in Vercel environment variables',
+          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
       });
     }
     return res.status(500).json({ error: 'Internal server error' });

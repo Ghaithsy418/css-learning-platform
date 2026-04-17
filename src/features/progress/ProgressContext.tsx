@@ -64,14 +64,21 @@ interface ProgressState {
 const ProgressContext = createContext<ProgressState | undefined>(undefined);
 
 const LS_KEY = 'ta3allam_progress';
+const FORCE_REMOTE_API_IN_LOCAL =
+  import.meta.env.VITE_USE_REMOTE_API_IN_LOCAL === 'true';
+
+function isLocalhost() {
+  return (
+    window.location.hostname.includes('localhost') ||
+    window.location.hostname.includes('127.0.0.1')
+  );
+}
 
 /* ── Helpers — localStorage fallback for local dev ── */
 function isApiAvailable() {
-  // In production (Vercel), API routes are available. Locally, they're not.
-  return (
-    !window.location.hostname.includes('localhost') &&
-    !window.location.hostname.includes('127.0.0.1')
-  );
+  if (FORCE_REMOTE_API_IN_LOCAL) return true;
+  // Default behavior: local dev uses localStorage fallback unless overridden.
+  return !isLocalhost();
 }
 
 function getLocalProgress(userId: number): UserProgress | null {

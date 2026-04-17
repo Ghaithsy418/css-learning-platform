@@ -7,30 +7,48 @@ interface RedisEnvConfig {
   tokenSource: string;
 }
 
+function normalizeEnvValue(raw: string | undefined) {
+  if (!raw) return undefined;
+
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim() || undefined;
+  }
+
+  return trimmed;
+}
+
 function readRedisEnv(): RedisEnvConfig | null {
-  const urlCandidates: Array<[string, string | undefined]> = [
-    ['UPSTASH_REDIS_REST_URL', process.env.UPSTASH_REDIS_REST_URL],
-    ['KV_REST_API_URL', process.env.KV_REST_API_URL],
-  ];
+  const upstashUrl = normalizeEnvValue(process.env.UPSTASH_REDIS_REST_URL);
+  const upstashToken = normalizeEnvValue(process.env.UPSTASH_REDIS_REST_TOKEN);
 
-  const tokenCandidates: Array<[string, string | undefined]> = [
-    ['UPSTASH_REDIS_REST_TOKEN', process.env.UPSTASH_REDIS_REST_TOKEN],
-    ['KV_REST_API_TOKEN', process.env.KV_REST_API_TOKEN],
-  ];
+  if (upstashUrl && upstashToken) {
+    return {
+      url: upstashUrl,
+      token: upstashToken,
+      urlSource: 'UPSTASH_REDIS_REST_URL',
+      tokenSource: 'UPSTASH_REDIS_REST_TOKEN',
+    };
+  }
 
-  const urlEntry = urlCandidates.find(([, value]) => Boolean(value?.trim()));
-  const tokenEntry = tokenCandidates.find(([, value]) =>
-    Boolean(value?.trim()),
-  );
+  const kvUrl = normalizeEnvValue(process.env.KV_REST_API_URL);
+  const kvToken = normalizeEnvValue(process.env.KV_REST_API_TOKEN);
 
-  if (!urlEntry || !tokenEntry) return null;
+  if (kvUrl && kvToken) {
+    return {
+      url: kvUrl,
+      token: kvToken,
+      urlSource: 'KV_REST_API_URL',
+      tokenSource: 'KV_REST_API_TOKEN',
+    };
+  }
 
-  return {
-    url: urlEntry[1]!.trim(),
-    token: tokenEntry[1]!.trim(),
-    urlSource: urlEntry[0],
-    tokenSource: tokenEntry[0],
-  };
+  return null;
 }
 
 let cachedRedis: Redis | null = null;
@@ -70,4 +88,28 @@ export function getRedisConfigurationSource() {
     url: config.urlSource,
     token: config.tokenSource,
   };
+}
+
+export function isRedisAuthOrConfigError(error: unknown) {
+  const message =
+    typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message?: unknown }).message ?? '')
+      : '';
+
+  const code =
+    typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code?: unknown }).code ?? '')
+      : '';
+
+  const haystack = `${message} ${code}`.toLowerCase();
+
+  return (
+    haystack.includes('403') ||
+    haystack.includes('unauthorized') ||
+    haystack.includes('forbidden') ||
+    haystack.includes('auth') ||
+    haystack.includes('token') ||
+    haystack.includes('permission') ||
+    haystack.includes('invalid')
+  );
 }

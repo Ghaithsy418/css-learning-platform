@@ -27,7 +27,6 @@ import {
 } from './features/lessonLock/LessonLockContext';
 import SmartIndexRedirect from './features/lessonLock/SmartIndexRedirect';
 import TrackGuard from './features/lessonLock/TrackGuard';
-import NotificationManager from './features/notifications/NotificationManager';
 import { ProgressProvider } from './features/progress/ProgressContext';
 import FlexboxExercise1 from './lessons/flexbox/FlexboxExercise1';
 import FlexboxExercise2 from './lessons/flexbox/FlexboxExercise2';
@@ -926,7 +925,6 @@ function App() {
         <LessonLockProvider>
           <BrowserRouter>
             <ChunkErrorBoundary>
-              <NotificationManager />
               <Toaster position="top-center" />
               <Routes>
                 {/* ── Login ── */}
@@ -934,7 +932,6 @@ function App() {
                   path="/login"
                   element={<LoginPage />}
                 />
-
                 {/* ── Home Page (path chooser) — public ── */}
                 <Route
                   path="/"
