@@ -1,10 +1,11 @@
-import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { UserProgress } from '../src/types/progress';
-
-const redis = Redis.fromEnv();
+import {
+  getRedisClient,
+  getRedisConfigurationErrorMessage,
+} from './_lib/redis';
 
 interface UserRecord {
   id: number;
@@ -31,9 +32,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'adminId required' });
     }
 
-    // Check that Redis env vars are configured
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      return res.status(503).json({ error: 'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars' });
+    const redis = getRedisClient();
+    if (!redis) {
+      return res.status(503).json({
+        error: getRedisConfigurationErrorMessage(),
+      });
     }
 
     // Read users.json to verify admin role
@@ -84,7 +87,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err: any) {
     console.error('Progress-all API error:', err);
     if (err?.message?.includes('permission') || err?.code === 403) {
-      return res.status(503).json({ error: 'Redis auth failed — check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars' });
+      return res.status(503).json({
+        error:
+          'Redis auth failed — verify your token/URL pair in Vercel environment variables',
+      });
     }
     return res.status(500).json({ error: 'Internal server error' });
   }

@@ -1,10 +1,11 @@
-import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { LeaderboardEntry, UserProgress } from '../src/types/progress';
-
-const redis = Redis.fromEnv();
+import {
+  getRedisClient,
+  getRedisConfigurationErrorMessage,
+} from './_lib/redis';
 
 interface UserRecord {
   id: number;
@@ -37,17 +38,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const redis = getRedisClient();
+    if (!redis) {
+      return res.status(503).json({
+        error: getRedisConfigurationErrorMessage(),
+      });
+    }
+
     const usersPath = path.join(process.cwd(), 'public', 'users.json');
     const usersData: UserRecord[] = JSON.parse(
       fs.readFileSync(usersPath, 'utf-8'),
     );
-
-    if (
-      !process.env.UPSTASH_REDIS_REST_URL ||
-      !process.env.UPSTASH_REDIS_REST_TOKEN
-    ) {
-      return res.status(503).json({ error: 'Redis not configured' });
-    }
 
     const userIds = await redis.smembers('progress:user_ids');
     const progressMap: Record<string, UserProgress> = {};

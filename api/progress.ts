@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis';
+import type { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type {
   AddHomeworkMessageReactionPayload,
@@ -17,8 +17,10 @@ import {
   sendNotificationToRole,
   sendNotificationToUsers,
 } from './_lib/notifications';
-
-const redis = Redis.fromEnv();
+import {
+  getRedisClient,
+  getRedisConfigurationErrorMessage,
+} from './_lib/redis';
 const HOMEWORK_LESSON_ID = 'js-homework';
 const HOMEWORK_EXERCISE_ID = 'submission-history';
 
@@ -30,6 +32,7 @@ function pushReaction(
 }
 
 async function notifyStudentAboutHomeworkInteraction(
+  redis: Redis,
   userId: number,
   title: string,
   body: string,
@@ -54,18 +57,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  // Check that Redis env vars are configured
-  if (
-    !process.env.UPSTASH_REDIS_REST_URL ||
-    !process.env.UPSTASH_REDIS_REST_TOKEN
-  ) {
+  const redis = getRedisClient();
+  if (!redis) {
     return res.status(503).json({
-      error:
-        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars',
+      error: getRedisConfigurationErrorMessage(),
     });
   }
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
 
   try {
     /* ── GET /api/progress?userId=1 ── */
@@ -205,6 +202,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (body.type === 'homework-message') {
           const messagePayload = body as AddHomeworkTeacherMessagePayload;
           await notifyStudentAboutHomeworkInteraction(
+            redis,
             body.userId,
             'رسالة جديدة من المعلم',
             messagePayload.message,
@@ -220,6 +218,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const reactor = getUserById(reactionPayload.reactorId);
           if (reactor?.role === 'admin') {
             await notifyStudentAboutHomeworkInteraction(
+              redis,
               body.userId,
               'تفاعل جديد من المعلم',
               `${reactionPayload.reactorName} تفاعل على واجبك ${reactionPayload.emoji}`,
@@ -237,6 +236,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const reactor = getUserById(reactionPayload.reactorId);
           if (reactor?.role === 'admin') {
             await notifyStudentAboutHomeworkInteraction(
+              redis,
               body.userId,
               'تفاعل جديد على رسالة المعلم',
               `${reactionPayload.reactorName} تفاعل على الرسالة ${reactionPayload.emoji}`,

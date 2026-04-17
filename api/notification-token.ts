@@ -1,8 +1,9 @@
-import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getUserById, registerNotificationToken } from './_lib/notifications';
-
-const redis = Redis.fromEnv();
+import {
+  getRedisClient,
+  getRedisConfigurationErrorMessage,
+} from './_lib/redis';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,13 +15,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (
-    !process.env.UPSTASH_REDIS_REST_URL ||
-    !process.env.UPSTASH_REDIS_REST_TOKEN
-  ) {
+  const redis = getRedisClient();
+  if (!redis) {
     return res.status(503).json({
-      error:
-        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN',
+      error: getRedisConfigurationErrorMessage(),
     });
   }
 

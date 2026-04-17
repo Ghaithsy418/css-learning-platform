@@ -1,10 +1,11 @@
-import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import { sendNotificationToRole } from './_lib/notifications';
-
-const redis = Redis.fromEnv();
+import {
+  getRedisClient,
+  getRedisConfigurationErrorMessage,
+} from './_lib/redis';
 
 const LOCKED_KEY = 'config:locked_lessons';
 const lessonNotificationMeta: Record<string, { label: string; link: string }> =
@@ -77,13 +78,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  if (
-    !process.env.UPSTASH_REDIS_REST_URL ||
-    !process.env.UPSTASH_REDIS_REST_TOKEN
-  ) {
+  const redis = getRedisClient();
+  if (!redis) {
     return res.status(503).json({
-      error:
-        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN',
+      error: getRedisConfigurationErrorMessage(),
     });
   }
 
