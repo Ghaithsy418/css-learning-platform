@@ -1,11 +1,9 @@
+import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  getRedisClient,
-  getRedisConfigurationErrorMessage,
-  isRedisAuthOrConfigError,
-} from './_lib/redis';
+
+const redis = Redis.fromEnv();
 
 const LOCKED_KEY = 'config:locked_lessons';
 
@@ -37,10 +35,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const redis = getRedisClient();
-  if (!redis) {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
     return res.status(503).json({
-      error: getRedisConfigurationErrorMessage(),
+      error:
+        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN',
     });
   }
 
@@ -82,11 +83,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err: any) {
     console.error('Lessons-config API error:', err);
-    if (isRedisAuthOrConfigError(err)) {
-      return res.status(503).json({
-        error:
-          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
-      });
+    if (err?.message?.includes('permission') || err?.code === 403) {
+      return res.status(503).json({ error: 'Redis auth failed' });
     }
     return res.status(500).json({ error: 'Internal server error' });
   }

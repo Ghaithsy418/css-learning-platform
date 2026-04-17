@@ -1,3 +1,4 @@
+import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type {
   AddHomeworkMessageReactionPayload,
@@ -11,11 +12,8 @@ import type {
   ProgressSubmissionPayload,
   UserProgress,
 } from '../src/types/progress';
-import {
-  getRedisClient,
-  getRedisConfigurationErrorMessage,
-  isRedisAuthOrConfigError,
-} from './_lib/redis';
+
+const redis = Redis.fromEnv();
 const HOMEWORK_LESSON_ID = 'js-homework';
 const HOMEWORK_EXERCISE_ID = 'submission-history';
 
@@ -33,10 +31,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const redis = getRedisClient();
-  if (!redis) {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
     return res.status(503).json({
-      error: getRedisConfigurationErrorMessage(),
+      error:
+        'Redis not configured — set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel env vars',
     });
   }
 
@@ -265,12 +266,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('Progress API error:', err);
-    if (isRedisAuthOrConfigError(err)) {
-      return res.status(503).json({
-        error:
-          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
-      });
-    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

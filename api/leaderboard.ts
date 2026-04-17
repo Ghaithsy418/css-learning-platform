@@ -1,12 +1,10 @@
+import { Redis } from '@upstash/redis';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { LeaderboardEntry, UserProgress } from '../src/types/progress';
-import {
-  getRedisClient,
-  getRedisConfigurationErrorMessage,
-  isRedisAuthOrConfigError,
-} from './_lib/redis';
+
+const redis = Redis.fromEnv();
 
 interface UserRecord {
   id: number;
@@ -39,17 +37,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const redis = getRedisClient();
-    if (!redis) {
-      return res.status(503).json({
-        error: getRedisConfigurationErrorMessage(),
-      });
-    }
-
     const usersPath = path.join(process.cwd(), 'public', 'users.json');
     const usersData: UserRecord[] = JSON.parse(
       fs.readFileSync(usersPath, 'utf-8'),
     );
+
+    if (
+      !process.env.UPSTASH_REDIS_REST_URL ||
+      !process.env.UPSTASH_REDIS_REST_TOKEN
+    ) {
+      return res.status(503).json({ error: 'Redis not configured' });
+    }
 
     const userIds = await redis.smembers('progress:user_ids');
     const progressMap: Record<string, UserProgress> = {};
@@ -91,12 +89,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json(leaderboard);
   } catch (error) {
     console.error('Leaderboard API error:', error);
-    if (isRedisAuthOrConfigError(error)) {
-      return res.status(503).json({
-        error:
-          'Redis auth/config failed — verify matching URL+TOKEN env pair in Vercel',
-      });
-    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
