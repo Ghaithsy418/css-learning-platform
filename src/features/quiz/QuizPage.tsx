@@ -4,21 +4,29 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useProgress } from '../progress/ProgressContext';
+import { advancedJsQuizzes } from './advancedJsQuizData';
 import Confetti from './Confetti';
-import QuizQuestion from './QuizQuestion';
 import { jsQuizzes } from './jsQuizData';
+import QuizQuestion from './QuizQuestion';
 
 const POINTS_PER_QUESTION = 5;
 
 export default function QuizPage() {
   const { lessonNum } = useParams<{ lessonNum: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const { submitResult, getExerciseResult } = useProgress();
 
-  const lessonId = `js-${lessonNum}`;
-  const quizConfig = jsQuizzes[lessonId];
+  const isAdvancedQuizRoute = location.pathname.includes('/js/advanced/');
+  const lessonId = isAdvancedQuizRoute
+    ? `adv-js-${lessonNum}`
+    : `js-${lessonNum}`;
+  const quizConfig = isAdvancedQuizRoute
+    ? advancedJsQuizzes[lessonId]
+    : jsQuizzes[lessonId];
+  const lessonPathPrefix = isAdvancedQuizRoute ? '/js/advanced' : '/js';
 
   const [phase, setPhase] = useState<'start' | 'quiz' | 'results'>('start');
   const [scores, setScores] = useState<Record<number, boolean>>({});
@@ -128,7 +136,7 @@ export default function QuizPage() {
           لا يوجد اختبار لهذا الدرس
         </p>
         <button
-          onClick={() => navigate(`/js/${lessonNum}`)}
+          onClick={() => navigate(`${lessonPathPrefix}/${lessonNum}`)}
           className="px-6 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors"
         >
           العودة للدرس
@@ -175,12 +183,12 @@ export default function QuizPage() {
                 setShowConfetti(false);
                 setPhase('quiz');
               }}
-              className="w-full px-8 py-4 bg-gradient-to-l from-amber-500 to-amber-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full px-8 py-4 bg-linear-to-l from-amber-500 to-amber-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
             >
               🚀 ابدأ الاختبار
             </button>
             <button
-              onClick={() => navigate(`/js/${lessonNum}`)}
+              onClick={() => navigate(`${lessonPathPrefix}/${lessonNum}`)}
               className="w-full px-6 py-3 text-gray-500 hover:text-gray-700 text-sm transition-colors"
             >
               ← العودة للدرس
@@ -209,7 +217,7 @@ export default function QuizPage() {
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-l from-amber-400 to-amber-500 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-linear-to-l from-amber-400 to-amber-500 rounded-full transition-all duration-500 ease-out"
               style={{
                 width: `${(answeredCount / totalQuestions) * 100}%`,
               }}
@@ -224,7 +232,7 @@ export default function QuizPage() {
               key={i}
               className="relative"
             >
-              <div className="absolute -right-8 top-5 w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center hidden sm:flex">
+              <div className="absolute -right-8 top-5 hidden h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700 max-sm:hidden sm:flex">
                 {i + 1}
               </div>
               <QuizQuestion
@@ -259,10 +267,10 @@ export default function QuizPage() {
       <div
         className={`rounded-2xl shadow-lg border-2 p-8 sm:p-10 text-center mb-8 ${
           percentage === 100
-            ? 'bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-300'
+            ? 'bg-linear-to-br from-emerald-50 to-green-50 border-emerald-300'
             : passed
-              ? 'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-300'
-              : 'bg-gradient-to-br from-red-50 to-orange-50 border-red-300'
+              ? 'bg-linear-to-br from-amber-50 to-yellow-50 border-amber-300'
+              : 'bg-linear-to-br from-red-50 to-orange-50 border-red-300'
         }`}
       >
         {/* Emoji & Grade */}
@@ -320,14 +328,16 @@ export default function QuizPage() {
             🔄 أعد الاختبار
           </button>
           <button
-            onClick={() => navigate(`/js/${lessonNum}`)}
+            onClick={() => navigate(`${lessonPathPrefix}/${lessonNum}`)}
             className="px-6 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-colors"
           >
             ← العودة للدرس
           </button>
           {Number(lessonNum) < 12 && (
             <button
-              onClick={() => navigate(`/js/${Number(lessonNum)! + 1}`)}
+              onClick={() =>
+                navigate(`${lessonPathPrefix}/${Number(lessonNum)! + 1}`)
+              }
               className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600 transition-colors"
             >
               الدرس التالي →

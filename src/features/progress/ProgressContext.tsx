@@ -25,6 +25,7 @@ import type {
   UserProgress,
 } from '../../types/progress';
 import { useAuth } from '../auth/AuthContext';
+import { advancedJsQuizzes } from '../quiz/advancedJsQuizData';
 import { jsQuizzes } from '../quiz/jsQuizData';
 
 const HOMEWORK_LESSON_ID = 'js-homework';
@@ -373,7 +374,7 @@ export const ProgressProvider: React.FC<{ children: ReactNode }> = ({
       if (!result) return null;
 
       if (exerciseId === 'quiz') {
-        const quizConfig = jsQuizzes[lessonId];
+        const quizConfig = jsQuizzes[lessonId] ?? advancedJsQuizzes[lessonId];
         if (quizConfig) {
           const currentMaxScore = quizConfig.questions.length * 5;
           return {

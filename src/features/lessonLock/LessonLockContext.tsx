@@ -39,6 +39,18 @@ export const jsLessonRoutes: { id: string; path: string }[] = [
   { id: 'js-10', path: '/js/10' },
   { id: 'js-11', path: '/js/11' },
   { id: 'js-12', path: '/js/12' },
+  { id: 'adv-js-1', path: '/js/advanced/1' },
+  { id: 'adv-js-2', path: '/js/advanced/2' },
+  { id: 'adv-js-3', path: '/js/advanced/3' },
+  { id: 'adv-js-4', path: '/js/advanced/4' },
+  { id: 'adv-js-5', path: '/js/advanced/5' },
+  { id: 'adv-js-6', path: '/js/advanced/6' },
+  { id: 'adv-js-7', path: '/js/advanced/7' },
+  { id: 'adv-js-8', path: '/js/advanced/8' },
+  { id: 'adv-js-9', path: '/js/advanced/9' },
+  { id: 'adv-js-10', path: '/js/advanced/10' },
+  { id: 'adv-js-11', path: '/js/advanced/11' },
+  { id: 'adv-js-12', path: '/js/advanced/12' },
 ];
 
 interface LessonLockState {

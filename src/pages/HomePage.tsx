@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
+import { advancedJavaScriptSection } from '../config/courseSections';
 import { useAuth } from '../features/auth/AuthContext';
 
 /* ── Stat badge ── */
@@ -246,8 +247,14 @@ export default function HomePage() {
     'تصحيح الأخطاء (Debugging)',
   ];
 
+  const advancedJsLessons = advancedJavaScriptSection.lessons.map(
+    (lesson) => lesson.title,
+  );
+  const advancedJsTopics = advancedJavaScriptSection.topics;
+
   const cssCode = `.container {\n  display: grid;\n  grid-template-columns:\n    repeat(3, 1fr);\n  gap: 1rem;\n}`;
   const jsCode = `const greet = (name) => {\n  return \`مرحباً، \${name}!\`;\n};\n\nconsole.log(greet('طالب'));`;
+  const advancedJsCode = `const fetchProfile = async (id) => {\n  try {\n    const response = await fetch(\`/api/users/\${id}\`);\n    if (!response.ok) throw new Error('Request failed');\n    return await response.json();\n  } catch (error) {\n    console.error(error);\n    return null;\n  }\n};`;
 
   return (
     <div
@@ -295,7 +302,8 @@ export default function HomePage() {
           {user ? (
             <>
               <span className="text-xs text-white/40 hidden sm:block">
-                أهلاً، <span className="text-white/70 font-medium">{user.name}</span>
+                أهلاً،{' '}
+                <span className="text-white/70 font-medium">{user.name}</span>
               </span>
               {user.role === 'admin' && (
                 <button
@@ -397,7 +405,7 @@ export default function HomePage() {
         </motion.p>
 
         {/* ── Path Cards ── */}
-        <div className="w-full max-w-4xl flex flex-col md:flex-row gap-6 items-stretch justify-center">
+        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
           <PathCard
             path="CSS"
             emoji="🎨"
@@ -430,6 +438,22 @@ export default function HomePage() {
             onClick={() => goToLesson('/js/1')}
             delay={0.65}
           />
+          <PathCard
+            path={advancedJavaScriptSection.title}
+            emoji="🧠"
+            title={advancedJavaScriptSection.title}
+            subtitle={advancedJavaScriptSection.subtitle}
+            description={advancedJavaScriptSection.description}
+            lessons={advancedJsLessons}
+            topics={advancedJsTopics}
+            gradientFrom="#0284c7"
+            gradientTo="#06b6d4"
+            glowColor="linear-gradient(135deg, rgba(2,132,199,0.55), rgba(6,182,212,0.32))"
+            badgeColor="rgba(6,182,212,0.18)"
+            codeSnippet={advancedJsCode}
+            onClick={() => goToLesson(advancedJavaScriptSection.startPath)}
+            delay={0.8}
+          />
         </div>
 
         {/* ── Stats bar ── */}
@@ -450,7 +474,7 @@ export default function HomePage() {
             />
             <div className="w-px h-8 bg-white/10 hidden sm:block" />
             <Stat
-              value="2"
+              value="3"
               label="مسار تعليمي"
             />
             <div className="w-px h-8 bg-white/10 hidden sm:block" />

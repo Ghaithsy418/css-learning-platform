@@ -11,10 +11,13 @@ import {
   useLocation,
   useNavigate,
   useOutlet,
+  useParams,
 } from 'react-router-dom';
 import FlexboxReference from './components/FlexboxReference';
 import Logo from './components/Logo';
 import QuickReference from './components/QuickRefrence';
+import { advancedJavaScriptLessonsArabic } from './config/courseSections';
+import { javaScriptLessonByNum } from './config/javascriptLessons';
 import { AuthProvider, useAuth } from './features/auth/AuthContext';
 import LoginPage from './features/auth/LoginPage';
 import LessonGuard from './features/lessonLock/LessonGuard';
@@ -35,6 +38,7 @@ import GridExercise3 from './lessons/grid/GridExercise3';
 import JsDomExercise1 from './lessons/javascript/JsDomExercise1';
 import JsFunctionsExercise1 from './lessons/javascript/JsFunctionsExercise1';
 import JsVariablesExercise1 from './lessons/javascript/JsVariablesExercise1';
+import JavaScriptLessonTemplate from './lessons/javascript/JavaScriptLessonTemplate';
 import PositionExercise1 from './lessons/position/PositionExercise1';
 import PositionExercise2 from './lessons/position/PositionExercise2';
 import ResponsiveExercise1 from './lessons/responsive/ResponsiveExercise1';
@@ -75,7 +79,7 @@ class ChunkErrorBoundary extends Component<
 > {
   state = { hasError: false };
 
-  static getDerivedStateFromError(_: Error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -134,9 +138,81 @@ const JsArrayMethodsExercise1 = lazyRetry(
 const JsDebuggingExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsDebuggingExercise1'),
 );
+const AdvancedJavaScriptPage = lazyRetry(
+  () => import('./pages/AdvancedJavaScriptPage'),
+);
+const JavaScriptLessonsPage = lazyRetry(
+  () => import('./pages/JavaScriptLessonsPage'),
+);
+const AdvancedJsLesson1 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson1'),
+);
+const AdvancedJsLesson2 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson2'),
+);
+const AdvancedJsLesson3 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson3'),
+);
+const AdvancedJsLesson4 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson4'),
+);
+const AdvancedJsLesson5 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson5'),
+);
+const AdvancedJsLesson6 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson6'),
+);
+const AdvancedJsLesson7 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson7'),
+);
+const AdvancedJsLesson8 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson8'),
+);
+const AdvancedJsLesson9 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson9'),
+);
+const AdvancedJsLesson10 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson10'),
+);
+const AdvancedJsLesson11 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson11'),
+);
+const AdvancedJsLesson12 = lazyRetry(
+  () => import('./lessons/advanced-js/AdvancedJsLesson12'),
+);
 const JsClassroomPage = lazyRetry(() => import('./pages/JsClassroomPage'));
 const JsHomeworkPage = lazyRetry(() => import('./pages/JsHomeworkPage'));
 const QuizPage = lazyRetry(() => import('./features/quiz/QuizPage'));
+
+const advancedLessonComponents: Record<string, React.ComponentType> = {
+  '1': AdvancedJsLesson1,
+  '2': AdvancedJsLesson2,
+  '3': AdvancedJsLesson3,
+  '4': AdvancedJsLesson4,
+  '5': AdvancedJsLesson5,
+  '6': AdvancedJsLesson6,
+  '7': AdvancedJsLesson7,
+  '8': AdvancedJsLesson8,
+  '9': AdvancedJsLesson9,
+  '10': AdvancedJsLesson10,
+  '11': AdvancedJsLesson11,
+  '12': AdvancedJsLesson12,
+};
+
+const jsLessonComponents: Record<string, React.ComponentType> = {
+  '1': JsVariablesExercise1,
+  '2': JsOperatorsExercise1,
+  '3': JsConditionalsExercise1,
+  '4': JsLoopsExercise1,
+  '5': JsFunctionsExercise1,
+  '6': JsArraysExercise1,
+  '7': JsObjectsExercise1,
+  '8': JsDomExercise1,
+  '9': JsEventsExercise1,
+  '10': JsStringsExercise1,
+  '11': JsArrayMethodsExercise1,
+  '12': JsDebuggingExercise1,
+};
 
 /* ── Loader for lazy components ── */
 const LazyFallback = () => (
@@ -187,13 +263,13 @@ const trackAccents: Record<'css' | 'js', TrackAccent> = {
     activeBorder: 'border-purple-400',
     sectionColor: 'text-purple-400',
     switchPath: '/js/1',
-    switchLabel: '⚡ مسار JavaScript',
+    switchLabel: '⚡ مسار جافاسكريبت',
   },
   js: {
     activeBorder: 'border-amber-400',
     sectionColor: 'text-amber-400',
     switchPath: '/css/grid/1',
-    switchLabel: '🎨 مسار CSS',
+    switchLabel: '🎨 مسار سي إس إس',
   },
 };
 
@@ -235,6 +311,104 @@ const SidebarLink = ({
   );
 };
 
+const normalizeAdvancedLessonNum = (raw: string | undefined): string | null => {
+  if (!raw) return null;
+  if (/^\d+$/.test(raw)) {
+    const numeric = Number(raw);
+    return numeric >= 1 && numeric <= 12 ? String(numeric) : null;
+  }
+  if (/^adv-js-\d+$/.test(raw)) {
+    const numeric = Number(raw.replace('adv-js-', ''));
+    return numeric >= 1 && numeric <= 12 ? String(numeric) : null;
+  }
+  return null;
+};
+
+const normalizeJsLessonNum = (raw: string | undefined): string | null => {
+  if (!raw) return null;
+  if (!/^\d+$/.test(raw)) return null;
+  const numeric = Number(raw);
+  return numeric >= 1 && numeric <= 12 ? String(numeric) : null;
+};
+
+const advancedSidebarShortNames: Record<string, string> = {
+  'adv-js-1': 'محرك JavaScript',
+  'adv-js-2': 'بيئة المتصفح',
+  'adv-js-3': 'الدوال المغلقة',
+  'adv-js-4': 'أحداث DOM',
+  'adv-js-5': 'النماذج الوراثية',
+  'adv-js-6': 'فئات ES6',
+  'adv-js-7': 'حلقة الأحداث',
+  'adv-js-8': 'وعود Fetch',
+  'adv-js-9': 'Async Await',
+  'adv-js-10': 'تخزين محلي',
+  'adv-js-11': 'وحدات ES6',
+  'adv-js-12': 'مشروع تكاملي',
+};
+
+const AdvancedJsLessonRoute = () => {
+  const { lessonNum } = useParams<{ lessonNum: string }>();
+  const normalized = normalizeAdvancedLessonNum(lessonNum);
+
+  if (!normalized) {
+    return (
+      <Navigate
+        to="/js/advanced"
+        replace
+      />
+    );
+  }
+
+  const LessonComponent = advancedLessonComponents[normalized];
+  if (!LessonComponent) {
+    return (
+      <Navigate
+        to="/js/advanced"
+        replace
+      />
+    );
+  }
+
+  return (
+    <LessonGuard lessonId={`adv-js-${normalized}`}>
+      <LessonComponent />
+    </LessonGuard>
+  );
+};
+
+const JsLessonRoute = () => {
+  const { lessonNum } = useParams<{ lessonNum: string }>();
+  const normalized = normalizeJsLessonNum(lessonNum);
+
+  if (!normalized) {
+    return (
+      <Navigate
+        to="/js/lessons"
+        replace
+      />
+    );
+  }
+
+  const LessonComponent = jsLessonComponents[normalized];
+  const lessonMeta = javaScriptLessonByNum[normalized];
+
+  if (!LessonComponent || !lessonMeta) {
+    return (
+      <Navigate
+        to="/js/lessons"
+        replace
+      />
+    );
+  }
+
+  return (
+    <LessonGuard lessonId={lessonMeta.id}>
+      <JavaScriptLessonTemplate lesson={lessonMeta}>
+        <LessonComponent />
+      </JavaScriptLessonTemplate>
+    </LessonGuard>
+  );
+};
 /* ── Section divider ── */
 const SidebarSection = ({ label, color }: { label: string; color: string }) => (
   <div
@@ -256,7 +430,7 @@ const CssSidebar = ({
 }) => (
   <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 sidebar-scroll">
     <SidebarSection
-      label="Grid 📐"
+      label="الشبكات 📐"
       color={accent.sectionColor}
     />
     <SidebarLink
@@ -275,33 +449,33 @@ const CssSidebar = ({
     />
     <SidebarLink
       to="/css/grid/3"
-      label="3. التمدد (Spanning)"
+      label="3. تمدد المسارات"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="grid-3"
     />
 
     <SidebarSection
-      label="Flexbox 📦"
+      label="فليكس بوكس 📦"
       color={accent.sectionColor}
     />
     <SidebarLink
       to="/css/flexbox/1"
-      label="1. المحاذاة الأساسية"
+      label="1. محاذاة مرنة"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="flex-1"
     />
     <SidebarLink
       to="/css/flexbox/2"
-      label="2. الاتجاه والالتفاف"
+      label="2. اتجاه والتفاف"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="flex-2"
     />
     <SidebarLink
       to="/css/flexbox/3"
-      label="3. التمدد (Grow)"
+      label="3. نمو العناصر"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="flex-3"
@@ -313,56 +487,56 @@ const CssSidebar = ({
     />
     <SidebarLink
       to="/css/shadows/1"
-      label="1. الظلال (Shadows)"
+      label="1. تأثير الظلال"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="shadow-1"
     />
     <SidebarLink
       to="/css/units/1"
-      label="2. الوحدات (px, rem, em)"
+      label="2. وحدات القياس"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="units-1"
     />
     <SidebarLink
       to="/css/variables/1"
-      label="3. المتغيرات (Variables)"
+      label="3. متغيرات CSS"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="vars-1"
     />
     <SidebarLink
       to="/css/responsive/1"
-      label="4. التجاوب (Responsive)"
+      label="4. تصميم متجاوب"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="resp-1"
     />
     <SidebarLink
       to="/css/responsive/2"
-      label="5. نصوص مرنة (clamp)"
+      label="5. نصوص مرنة"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="resp-2"
     />
     <SidebarLink
       to="/css/responsive/3"
-      label="6. تغيير التخطيط"
+      label="6. تبديل التخطيط"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="resp-3"
     />
     <SidebarLink
       to="/css/position/1"
-      label="7. التموضع المطلق"
+      label="7. تموضع مطلق"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="pos-1"
     />
     <SidebarLink
       to="/css/position/2"
-      label="8. التثبيت (Sticky)"
+      label="8. تثبيت لاصق"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="pos-2"
@@ -375,13 +549,13 @@ const CssSidebar = ({
       />
       <SidebarLink
         to="/css/reference/grid"
-        label="مرجع Grid"
+        label="مرجع الشبكات"
         onClick={close}
         accentBorder={accent.activeBorder}
       />
       <SidebarLink
         to="/css/reference/flexbox"
-        label="مرجع Flexbox"
+        label="مرجع فليكس بوكس"
         onClick={close}
         accentBorder={accent.activeBorder}
       />
@@ -390,7 +564,7 @@ const CssSidebar = ({
 );
 
 /* ═══════════════════════════════════════════════
-   JS Sidebar Navigation — 12 lessons in 4 groups
+  JS Sidebar Navigation
 ═══════════════════════════════════════════════ */
 const JsSidebar = ({
   close,
@@ -406,13 +580,19 @@ const JsSidebar = ({
     />
     <SidebarLink
       to="/js/classroom"
-      label="الخطة الصفية والترتيب"
+      label="الخطة الصفية"
       onClick={close}
       accentBorder={accent.activeBorder}
     />
     <SidebarLink
       to="/js/homework"
       label="الواجب البرمجي"
+      onClick={close}
+      accentBorder={accent.activeBorder}
+    />
+    <SidebarLink
+      to="/js/lessons"
+      label="خريطة الدروس"
       onClick={close}
       accentBorder={accent.activeBorder}
     />
@@ -423,21 +603,21 @@ const JsSidebar = ({
     />
     <SidebarLink
       to="/js/1"
-      label="1. المتغيرات وأنواع البيانات"
+      label="1. أساسيات المتغيرات"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-1"
     />
     <SidebarLink
       to="/js/2"
-      label="2. العمليات والمعاملات"
+      label="2. المعاملات الأساسية"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-2"
     />
     <SidebarLink
       to="/js/3"
-      label="3. الجمل الشرطية"
+      label="3. الشروط المنطقية"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-3"
@@ -456,21 +636,21 @@ const JsSidebar = ({
     />
     <SidebarLink
       to="/js/5"
-      label="5. الدوال (Functions)"
+      label="5. إنشاء الدوال"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-5"
     />
     <SidebarLink
       to="/js/6"
-      label="6. المصفوفات (Arrays)"
+      label="6. المصفوفات العملية"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-6"
     />
     <SidebarLink
       to="/js/7"
-      label="7. الكائنات (Objects)"
+      label="7. الكائنات العملية"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-7"
@@ -489,7 +669,7 @@ const JsSidebar = ({
     />
     <SidebarLink
       to="/js/9"
-      label="9. الأحداث (Events)"
+      label="9. إدارة الأحداث"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-9"
@@ -501,14 +681,14 @@ const JsSidebar = ({
     />
     <SidebarLink
       to="/js/10"
-      label="10. النصوص (Strings)"
+      label="10. معالجة النصوص"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-10"
     />
     <SidebarLink
       to="/js/11"
-      label="11. دوال المصفوفات"
+      label="11. دوال المصفوفة"
       onClick={close}
       accentBorder={accent.activeBorder}
       lessonId="js-11"
@@ -520,6 +700,27 @@ const JsSidebar = ({
       accentBorder={accent.activeBorder}
       lessonId="js-12"
     />
+
+    <SidebarSection
+      label="جافاسكريبت المتقدم 🧠"
+      color={accent.sectionColor}
+    />
+    <SidebarLink
+      to="/js/advanced"
+      label="المسار المتقدم"
+      onClick={close}
+      accentBorder={accent.activeBorder}
+    />
+    {advancedJavaScriptLessonsArabic.map((lesson, index) => (
+      <SidebarLink
+        key={lesson.id}
+        to={`/js/advanced/${index + 1}`}
+        label={`${index + 1}. ${advancedSidebarShortNames[lesson.id] ?? lesson.title}`}
+        onClick={close}
+        accentBorder={accent.activeBorder}
+        lessonId={lesson.id}
+      />
+    ))}
   </nav>
 );
 
@@ -1020,184 +1221,48 @@ function App() {
                     }
                   />
 
-                  {/* الأساسيات */}
                   <Route
-                    path="1"
-                    element={
-                      <LessonGuard lessonId="js-1">
-                        <LessonHeader
-                          title="المتغيرات وأنواع البيانات"
-                          description="تعلم let و const وأنواع البيانات في JavaScript."
-                          color="amber"
-                        />
-                        <JsVariablesExercise1 />
-                      </LessonGuard>
-                    }
-                  />
-                  <Route
-                    path="2"
+                    path="lessons"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-2">
-                          <LessonHeader
-                            title="العمليات والمعاملات"
-                            description="العمليات الحسابية والمنطقية والمقارنة."
-                            color="amber"
-                          />
-                          <JsOperatorsExercise1 />
-                        </LessonGuard>
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="3"
-                    element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-3">
-                          <LessonHeader
-                            title="الجمل الشرطية"
-                            description="if / else / else if وعامل التشغيل الشرطي."
-                            color="amber"
-                          />
-                          <JsConditionalsExercise1 />
-                        </LessonGuard>
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="4"
-                    element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-4">
-                          <LessonHeader
-                            title="الحلقات التكرارية"
-                            description="for و while و do-while للتكرار."
-                            color="amber"
-                          />
-                          <JsLoopsExercise1 />
-                        </LessonGuard>
+                        <JavaScriptLessonsPage />
                       </Suspense>
                     }
                   />
 
-                  {/* البناء */}
                   <Route
-                    path="5"
-                    element={
-                      <LessonGuard lessonId="js-5">
-                        <LessonHeader
-                          title="الدوال (Functions)"
-                          description="من الدوال العادية إلى السهمية و Callbacks."
-                          color="amber"
-                        />
-                        <JsFunctionsExercise1 />
-                      </LessonGuard>
-                    }
-                  />
-                  <Route
-                    path="6"
+                    path="advanced"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-6">
-                          <LessonHeader
-                            title="المصفوفات (Arrays)"
-                            description="إنشاء المصفوفات والوصول للعناصر والتعديل عليها."
-                            color="amber"
-                          />
-                          <JsArraysExercise1 />
-                        </LessonGuard>
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="7"
-                    element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-7">
-                          <LessonHeader
-                            title="الكائنات (Objects)"
-                            description="إنشاء الكائنات والوصول للخصائص والتعامل معها."
-                            color="amber"
-                          />
-                          <JsObjectsExercise1 />
-                        </LessonGuard>
+                        <AdvancedJavaScriptPage />
                       </Suspense>
                     }
                   />
 
-                  {/* التفاعل */}
                   <Route
-                    path="8"
-                    element={
-                      <LessonGuard lessonId="js-8">
-                        <LessonHeader
-                          title="DOM والعناصر"
-                          description="تلاعب بعناصر الصفحة وأضف تفاعلية بالأحداث."
-                          color="amber"
-                        />
-                        <JsDomExercise1 />
-                      </LessonGuard>
-                    }
-                  />
-                  <Route
-                    path="9"
+                    path="advanced/:lessonNum/quiz"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-9">
-                          <LessonHeader
-                            title="الأحداث (Events)"
-                            description="addEventListener وأنواع الأحداث المختلفة."
-                            color="amber"
-                          />
-                          <JsEventsExercise1 />
-                        </LessonGuard>
+                        <QuizPage />
                       </Suspense>
                     }
                   />
 
-                  {/* المتقدم */}
                   <Route
-                    path="10"
+                    path="advanced/:lessonNum"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-10">
-                          <LessonHeader
-                            title="النصوص (Strings)"
-                            description="دوال النصوص والبحث والاستبدال والتقسيم."
-                            color="amber"
-                          />
-                          <JsStringsExercise1 />
-                        </LessonGuard>
+                        <AdvancedJsLessonRoute />
                       </Suspense>
                     }
                   />
+
+                  {/* دروس JavaScript الأساسية (بنفس نمط المسار المتقدم) */}
                   <Route
-                    path="11"
+                    path=":lessonNum"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-11">
-                          <LessonHeader
-                            title="دوال المصفوفات"
-                            description="map و filter و reduce و find وأكثر."
-                            color="amber"
-                          />
-                          <JsArrayMethodsExercise1 />
-                        </LessonGuard>
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="12"
-                    element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <LessonGuard lessonId="js-12">
-                          <LessonHeader
-                            title="تصحيح الأخطاء"
-                            description="أنواع الأخطاء وكيفية قراءتها وإصلاحها."
-                            color="amber"
-                          />
-                          <JsDebuggingExercise1 />
-                        </LessonGuard>
+                        <JsLessonRoute />
                       </Suspense>
                     }
                   />

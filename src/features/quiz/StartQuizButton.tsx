@@ -10,12 +10,14 @@ interface StartQuizButtonProps {
   lessonId: string;
   lessonNum: string;
   totalQuestions: number;
+  quizPath?: string;
 }
 
 export default function StartQuizButton({
   lessonId,
   lessonNum,
   totalQuestions,
+  quizPath,
 }: StartQuizButtonProps) {
   const navigate = useNavigate();
   const { getExerciseResult } = useProgress();
@@ -43,7 +45,7 @@ export default function StartQuizButton({
       </div>
 
       {/* Card */}
-      <div className="bg-gradient-to-l from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl p-6 sm:p-8 text-center">
+      <div className="bg-linear-to-l from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl p-6 sm:p-8 text-center">
         <p className="text-amber-800 text-lg font-bold mb-2">
           🎯 هل أنت مستعد للاختبار؟
         </p>
@@ -65,8 +67,8 @@ export default function StartQuizButton({
 
         <div>
           <button
-            onClick={() => navigate(`/js/${lessonNum}/quiz`)}
-            className="px-8 py-4 bg-gradient-to-l from-amber-500 to-amber-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            onClick={() => navigate(quizPath ?? `/js/${lessonNum}/quiz`)}
+            className="px-8 py-4 bg-linear-to-l from-amber-500 to-amber-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
           >
             🚀 ابدأ الاختبار
           </button>

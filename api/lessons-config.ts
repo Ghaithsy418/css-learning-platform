@@ -35,6 +35,18 @@ const lessonNotificationMeta: Record<string, { label: string; link: string }> =
     'js-10': { label: 'النصوص', link: '/js/10' },
     'js-11': { label: 'دوال المصفوفات', link: '/js/11' },
     'js-12': { label: 'تصحيح الأخطاء', link: '/js/12' },
+    'adv-js-1': { label: 'محرك JavaScript', link: '/js/advanced/1' },
+    'adv-js-2': { label: 'بيئة المتصفح', link: '/js/advanced/2' },
+    'adv-js-3': { label: 'الدوال المغلقة', link: '/js/advanced/3' },
+    'adv-js-4': { label: 'أحداث DOM', link: '/js/advanced/4' },
+    'adv-js-5': { label: 'النماذج الوراثية', link: '/js/advanced/5' },
+    'adv-js-6': { label: 'فئات ES6', link: '/js/advanced/6' },
+    'adv-js-7': { label: 'حلقة الأحداث', link: '/js/advanced/7' },
+    'adv-js-8': { label: 'Promises و Fetch', link: '/js/advanced/8' },
+    'adv-js-9': { label: 'Async Await', link: '/js/advanced/9' },
+    'adv-js-10': { label: 'التخزين المحلي', link: '/js/advanced/10' },
+    'adv-js-11': { label: 'وحدات ES6', link: '/js/advanced/11' },
+    'adv-js-12': { label: 'المشروع النهائي', link: '/js/advanced/12' },
   };
 
 interface UserRecord {
