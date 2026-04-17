@@ -10,12 +10,14 @@ export default function LessonGuard({
   lessonId: string;
   children: ReactNode;
 }) {
-  const { isLocked, getFirstUnlockedRoute } = useLessonLock();
+  const { isLocked, getFirstUnlockedRoute, isLocksLoading } = useLessonLock();
   const navigate = useNavigate();
   const location = useLocation();
   const hasRedirected = useRef(false);
 
   useEffect(() => {
+    if (isLocksLoading) return;
+
     if (!isLocked(lessonId)) {
       hasRedirected.current = false;
       return;
@@ -52,9 +54,16 @@ export default function LessonGuard({
       });
       navigate('/', { replace: true });
     }
-  }, [isLocked, lessonId, navigate, getFirstUnlockedRoute, location.pathname]);
+  }, [
+    isLocked,
+    isLocksLoading,
+    lessonId,
+    navigate,
+    getFirstUnlockedRoute,
+    location.pathname,
+  ]);
 
-  if (isLocked(lessonId)) {
+  if (isLocksLoading || isLocked(lessonId)) {
     // Return null while redirecting
     return null;
   }

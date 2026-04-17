@@ -55,6 +55,7 @@ export const jsLessonRoutes: { id: string; path: string }[] = [
 
 interface LessonLockState {
   lockedLessons: string[];
+  isLocksLoading: boolean;
   isLocked: (lessonId: string) => boolean;
   refreshLocks: () => void;
   /** Returns the first unlocked lesson route for a track, or null if all locked */
@@ -65,6 +66,7 @@ interface LessonLockState {
 
 const LessonLockContext = createContext<LessonLockState>({
   lockedLessons: [],
+  isLocksLoading: true,
   isLocked: () => false,
   refreshLocks: () => {},
   getFirstUnlockedRoute: () => null,
@@ -85,6 +87,7 @@ const useLocalFallback = isLocalHost && !FORCE_REMOTE_API_IN_LOCAL;
 
 export function LessonLockProvider({ children }: { children: ReactNode }) {
   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
+  const [isLocksLoading, setIsLocksLoading] = useState(true);
   const { user } = useAuth();
 
   const isBypassUser =
@@ -93,6 +96,7 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
     user?.name?.trim().toLowerCase() === 'ghaith';
 
   const fetchLocks = useCallback(async () => {
+    setIsLocksLoading(true);
     try {
       if (useLocalFallback) {
         const raw = localStorage.getItem('ta3allam_locked_lessons');
@@ -105,7 +109,9 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch {
-      /* silent */
+      setLockedLessons([]);
+    } finally {
+      setIsLocksLoading(false);
     }
   }, []);
 
@@ -144,6 +150,7 @@ export function LessonLockProvider({ children }: { children: ReactNode }) {
     <LessonLockContext.Provider
       value={{
         lockedLessons,
+        isLocksLoading,
         isLocked,
         refreshLocks: fetchLocks,
         getFirstUnlockedRoute,

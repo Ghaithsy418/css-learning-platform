@@ -294,7 +294,13 @@ const SidebarLink = ({
   return (
     <NavLink
       to={to}
-      onClick={onClick}
+      onClick={(event) => {
+        if (locked) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.();
+      }}
       className={({ isActive }) =>
         `block px-4 py-2.5 rounded-lg transition-all duration-200 text-sm ${
           locked
@@ -405,6 +411,56 @@ const JsLessonRoute = () => {
       <JavaScriptLessonTemplate lesson={lessonMeta}>
         <LessonComponent />
       </JavaScriptLessonTemplate>
+    </LessonGuard>
+  );
+};
+
+const AdvancedJsQuizRoute = () => {
+  const { lessonNum } = useParams<{ lessonNum: string }>();
+  const normalized = normalizeAdvancedLessonNum(lessonNum);
+
+  if (!normalized) {
+    return (
+      <Navigate
+        to="/js/advanced"
+        replace
+      />
+    );
+  }
+
+  return (
+    <LessonGuard lessonId={`adv-js-${normalized}`}>
+      <QuizPage />
+    </LessonGuard>
+  );
+};
+
+const JsQuizRoute = () => {
+  const { lessonNum } = useParams<{ lessonNum: string }>();
+  const normalized = normalizeJsLessonNum(lessonNum);
+
+  if (!normalized) {
+    return (
+      <Navigate
+        to="/js/lessons"
+        replace
+      />
+    );
+  }
+
+  const lessonMeta = javaScriptLessonByNum[normalized];
+  if (!lessonMeta) {
+    return (
+      <Navigate
+        to="/js/lessons"
+        replace
+      />
+    );
+  }
+
+  return (
+    <LessonGuard lessonId={lessonMeta.id}>
+      <QuizPage />
     </LessonGuard>
   );
 };
@@ -1240,7 +1296,7 @@ function App() {
                     path="advanced/:lessonNum/quiz"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <QuizPage />
+                        <AdvancedJsQuizRoute />
                       </Suspense>
                     }
                   />
@@ -1269,7 +1325,7 @@ function App() {
                     path=":lessonNum/quiz"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <QuizPage />
+                        <JsQuizRoute />
                       </Suspense>
                     }
                   />

@@ -7,7 +7,12 @@ import { useLessonLock } from './LessonLockContext';
  * or to "/" if all are locked (TrackGuard will handle the toast).
  */
 export default function SmartIndexRedirect({ track }: { track: 'css' | 'js' }) {
-  const { getFirstUnlockedRoute, isTrackFullyLocked } = useLessonLock();
+  const { getFirstUnlockedRoute, isTrackFullyLocked, isLocksLoading } =
+    useLessonLock();
+
+  if (isLocksLoading) {
+    return null;
+  }
 
   if (isTrackFullyLocked(track)) {
     return (

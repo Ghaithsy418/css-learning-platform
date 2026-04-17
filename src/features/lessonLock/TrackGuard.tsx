@@ -15,13 +15,16 @@ export default function TrackGuard({
   track: 'css' | 'js';
   children: ReactNode;
 }) {
-  const { isTrackFullyLocked, getFirstUnlockedRoute } = useLessonLock();
+  const { isTrackFullyLocked, getFirstUnlockedRoute, isLocksLoading } =
+    useLessonLock();
   const navigate = useNavigate();
   const hasRedirected = useRef(false);
 
   const fullyLocked = isTrackFullyLocked(track);
 
   useEffect(() => {
+    if (isLocksLoading) return;
+
     if (!fullyLocked) {
       hasRedirected.current = false;
       return;
@@ -40,9 +43,9 @@ export default function TrackGuard({
       duration: 4000,
     });
     navigate('/', { replace: true });
-  }, [fullyLocked, navigate, track, getFirstUnlockedRoute]);
+  }, [isLocksLoading, fullyLocked, navigate, track, getFirstUnlockedRoute]);
 
-  if (fullyLocked) return null;
+  if (isLocksLoading || fullyLocked) return null;
 
   return <>{children}</>;
 }
