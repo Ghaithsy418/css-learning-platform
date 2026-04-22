@@ -11,111 +11,153 @@ export const advancedJavaScriptLessonsDetailed: AdvancedJavaScriptLesson[] = [
   {
     id: 'adv-js-1',
     title:
-      'How JavaScript Works Behind the Scenes (Engine, Call Stack, Hoisting)',
+      'How JavaScript Runs (Compiler vs Interpreter, JIT, Call Stack, Hoisting)',
     description:
-      'Understand engine internals, execution contexts, memory creation, and hoisting behavior at runtime level.',
+      'Build a clear runtime model: why compilers and interpreters exist, how JIT boosts JavaScript, how call stack frames execute, and how hoisting really works.',
     objectives: [
-      'Explain how JavaScript source code moves through parse, compile, and execution stages inside an engine.',
-      'Trace how execution contexts are created and pushed onto the call stack during function calls.',
-      'Predict hoisting outcomes for var, let, const, and function declarations with confidence.',
+      'Explain the purpose of compilers and interpreters and compare their trade-offs in real execution.',
+      'Describe how JavaScript engines use JIT (profiling, optimization, and de-optimization) during runtime.',
+      'Trace call stack behavior in detail and predict hoisting outcomes for var, let, const, and functions.',
     ],
     deepDiveTheory: `
 ### Why this lesson matters
-Most JavaScript bugs are not syntax problems; they are mental-model problems. If you misunderstand what the engine does before your first line runs, you will misread errors, misunderstand scope, and write fragile code. This lesson gives you the runtime model that explains those bugs.
+Many JavaScript bugs are not syntax mistakes. They are execution-model mistakes. If you know what the engine does before and during execution, debugging becomes much easier and your code becomes more predictable.
 
-### From source code to running instructions
-A modern engine (such as V8, SpiderMonkey, or JavaScriptCore) does more than "interpret line by line". At a high level:
-1. **Parsing**: Source text is tokenized and transformed into an Abstract Syntax Tree (AST).
-2. **Compilation**: The AST becomes bytecode (or an internal representation) that the engine can execute.
-3. **Optimization**: Hot paths can be optimized using JIT strategies and inline caching.
-4. **Execution**: Instructions run within execution contexts on the call stack.
+### Purpose of a compiler and an interpreter
+Both exist to turn human-readable code into actions the machine can run.
+- **Compiler purpose**: Translate code to a lower-level form ahead of execution (or before a specific section runs) so execution can be fast and optimized.
+- **Interpreter purpose**: Execute code step-by-step from an internal representation so code can run immediately and stay flexible.
 
-<PhotoRenderer imageUrl="/images/advanced-js/engine-pipeline.png" altText="Pipeline showing parse, AST generation, compilation, optimization, and execution" caption="The JavaScript engine pipeline from source text to optimized machine-level behavior." />
+In modern JavaScript engines, these ideas are combined, not mutually exclusive.
 
-### Execution context and memory phase
-Before executing statements, JavaScript performs a setup phase for each execution context:
-- Creates a lexical environment (scope records).
-- Registers function declarations.
-- Initializes variable bindings.
-- Places var bindings with initial value undefined.
-- Leaves let and const in the temporal dead zone (TDZ) until declaration line execution.
+### Compiler vs interpreter: key differences
+1. **When translation happens**:
+- Compiler: before execution of a unit (or before optimized re-run).
+- Interpreter: while executing instructions.
+2. **Startup speed**:
+- Interpreter path usually starts faster.
+- Heavy compilation can cost startup time.
+3. **Peak performance**:
+- Compiled optimized code is usually faster on hot paths.
+- Pure interpreted execution is typically slower for repeated heavy loops.
+4. **Adaptability**:
+- Interpreters are easier to run immediately.
+- Optimizing compilers need runtime feedback to produce best machine code.
 
-<CodeBlock language="javascript">
-// Global execution context creation happens first.
+<PhotoRenderer imageUrl="/images/advanced-js/engine-pipeline.png" altText="JavaScript pipeline from source code through parsing, interpreted execution, and JIT optimization" caption="Modern JavaScript engines combine interpretation and compilation through a JIT pipeline." />
 
-console.log(total); // Step 1: var binding exists -> undefined
-// console.log(rate); // Step 2: would throw ReferenceError due to TDZ
+### How JIT works in JavaScript engines
+JavaScript engines (like V8, SpiderMonkey, and JavaScriptCore) typically use this runtime strategy:
+1. **Parse** source code into an AST.
+2. **Generate bytecode** and start executing quickly (interpreter/baseline tier).
+3. **Profile runtime behavior** (types seen, frequently called functions, hot loops).
+4. **Optimize hot code** by compiling it into faster machine code.
+5. **De-optimize when assumptions break** (for example, function expected numbers but receives strings), then fall back and re-optimize later.
 
-var total = 10; // Step 3: assignment happens during execution phase
-let rate = 0.2; // Step 4: rate exits TDZ here
-
-function calculate() {
-  // Step 5: new function execution context is created and pushed.
-  var local = total * rate;
-  return local;
-}
-
-console.log(calculate()); // Step 6: call stack push -> execute -> pop
-</CodeBlock>
-
-### Call stack mechanics
-JavaScript is single-threaded in userland execution. Only one call frame executes at a time. Every function call pushes a frame; returns pop frames.
+This is why JavaScript can have fast startup and still reach strong performance after warm-up.
 
 <CodeBlock language="javascript">
-function third() {
-  // Frame 3: currently executing
-  return 'done';
+function add(a, b) {
+  return a + b;
 }
 
-function second() {
-  // Frame 2: waits while third runs
-  return third();
+// First runs: engine gathers type feedback.
+console.log(add(2, 3));
+console.log(add(4, 7));
+
+// Hot path stays numeric -> likely optimization candidate.
+for (let i = 0; i < 100000; i += 1) {
+  add(i, i + 1);
 }
 
-function first() {
-  // Frame 1: waits while second runs
-  return second();
-}
-
-// Global frame invokes first
-console.log(first());
+// New type shape can invalidate assumptions and trigger de-optimization.
+console.log(add('2', 3)); // "23"
 </CodeBlock>
 
-If recursion is unbounded, stack overflow occurs because frames are never popped quickly enough.
+### Call stack in detail
+JavaScript executes one call frame at a time on the main thread.
 
-<InfoCallout type="warning" title="Hoisting misconception to avoid">
-Hoisting does not mean values move upward in source order. It means bindings are created during context setup. Function declarations become callable immediately in scope, while let and const are hoisted as bindings but remain uninitialized in TDZ.
+Each frame contains:
+- Function identity and current line/instruction.
+- Local bindings and parameter values.
+- Reference to outer lexical environment.
+- Return address (where execution continues after return).
+
+Execution flow:
+1. Global execution context is created and pushed first.
+2. Every function call pushes a new frame.
+3. The top frame runs until it returns or throws.
+4. On return, the frame is popped and control continues in the previous frame.
+5. Too many nested calls without unwinding can cause stack overflow.
+
+<CodeBlock language="javascript">
+function c() {
+  console.log('c start');
+  console.log('c end');
+}
+
+function b() {
+  console.log('b start');
+  c(); // push c frame
+  console.log('b end');
+}
+
+function a() {
+  console.log('a start');
+  b(); // push b frame
+  console.log('a end');
+}
+
+console.log('global start');
+a(); // push a frame
+console.log('global end');
+</CodeBlock>
+
+### Hoisting explained correctly
+Hoisting does **not** move code upward. It means bindings are created during the creation phase of an execution context.
+
+- **function declaration**: binding is created and initialized with the function object.
+- **var**: binding is created and initialized to \`undefined\`.
+- **let / const**: binding is created but uninitialized (Temporal Dead Zone) until declaration executes.
+- **function expression / arrow in variable**: behaves like its variable binding (\`var\` or \`let/const\`).
+
+<InfoCallout type="warning" title="Most common hoisting bug">
+Developers often confuse "binding exists" with "value is usable". In TDZ, the binding exists but is not initialized, so access throws ReferenceError.
 </InfoCallout>
 
-### Function declaration vs function expression
-Function declarations are hoisted with callable value. Function expressions behave like variables.
-
 <CodeBlock language="javascript">
-console.log(declared(2)); // Works: declaration is callable during setup
+console.log(total); // undefined (var initialized during creation)
+// console.log(rate); // ReferenceError (TDZ)
+console.log(sum(2, 3)); // 5 (function declaration is callable)
 
-function declared(x) {
-  return x * 2;
+var total = 10;
+let rate = 0.2;
+
+function sum(x, y) {
+  return x + y;
 }
 
-// console.log(expressed(2)); // TypeError if var, ReferenceError if let/const before declaration
-var expressed = function (x) {
-  return x * 3;
+// console.log(multiply(2, 3));
+// TypeError if var multiply is read before assignment.
+var multiply = function (x, y) {
+  return x * y;
 };
 </CodeBlock>
 `,
     practicalExercise: `
-Build a "runtime tracer" utility that logs every function entry/exit and predicts hoisting outcomes.
+Build a "mini engine notebook" script that demonstrates compiler vs interpreter thinking, JIT warm-up, call stack transitions, and hoisting behavior.
 
 Requirements:
-- Write a small script with 5 functions calling each other in nested order.
-- Before running, document expected call stack transitions frame-by-frame.
-- Add examples using var, let, const, function declaration, and function expression.
-- For each line, classify expected behavior: undefined, value, ReferenceError, or TypeError.
+- Add a short section in comments: purpose of compiler vs interpreter and one real trade-off for each.
+- Create one function called many times with consistent argument types, then one call with a different type to discuss possible JIT de-optimization.
+- Write 5 nested function calls and record stack push/pop order before running.
+- Add hoisting examples for var, let, const, function declaration, and function expression.
+- For each hoisting line, classify expected result: value, undefined, ReferenceError, or TypeError.
 
 Success criteria:
-- Your predicted outputs match actual outputs.
-- You can explain every mismatch using execution context creation and TDZ rules.
-- You include one recursion example and explain why stack overflow happens.
+- You can explain compiler vs interpreter purpose and differences in your own words.
+- Your runtime notes correctly describe where JIT helps and when de-optimization can happen.
+- Your predicted call stack and hoisting outcomes match actual execution.
 `,
   },
   {

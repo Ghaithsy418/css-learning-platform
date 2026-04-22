@@ -3,66 +3,149 @@ import type { AdvancedJavaScriptLesson } from './advancedJavaScriptLessons';
 export const advancedJavaScriptLessonsArabic: AdvancedJavaScriptLesson[] = [
   {
     id: 'adv-js-1',
-    title: 'كيف يعمل JavaScript خلف الكواليس (المحرك، Call Stack، Hoisting)',
+    title:
+      'كيف يُشغّل JavaScript الكود (Compiler vs Interpreter، JIT، Call Stack، Hoisting)',
     description:
-      'فهم دورة تنفيذ الكود داخل المحرك: من التحليل إلى التنفيذ، وكيف تؤثر بيئات التنفيذ ورفع التعريفات على النتائج.',
+      'بناء نموذج ذهني واضح: ما وظيفة الـ compiler والـ interpreter، كيف يعمل JIT في JavaScript، كيف تتحرك stack frames، وكيف يعمل hoisting فعلا.',
     objectives: [
-      'شرح مراحل عمل المحرك من parsing حتى التنفيذ الفعلي.',
-      'تتبع إنشاء Execution Contexts وانتقالها داخل Call Stack.',
-      'التنبؤ بسلوك hoisting مع var و let و const ودوال التصريح.',
+      'شرح هدف الـ compiler والـ interpreter والفرق العملي بينهما.',
+      'تفسير آلية JIT في JavaScript: profiling ثم optimization ثم de-optimization.',
+      'تتبع Call Stack بالتفصيل والتنبؤ بسلوك hoisting مع var و let و const والدوال.',
     ],
     deepDiveTheory: `
 ### لماذا هذا الدرس أساسي؟
-المشاكل الصعبة في JavaScript غالبا لا تكون أخطاء كتابة، بل أخطاء فهم النموذج الذهني للتنفيذ. عندما تعرف ما الذي يحدث قبل تنفيذ أول سطر، تصبح قادرا على تفسير الأخطاء الغامضة بدقة.
+أغلب أخطاء JavaScript المعقدة ليست syntax errors، بل أخطاء في فهم ما يحدث وقت التشغيل. عندما تفهم ما الذي يفعله المحرك قبل وأثناء التنفيذ، تصبح قراراتك البرمجية أدق.
 
-### ماذا يفعل المحرك فعليا؟
-محرك JavaScript الحديث يمر بعدة مراحل:
-1. **Parsing**: تحويل النص إلى Tokens ثم AST.
-2. **Compilation**: تحويل AST إلى تمثيل قابل للتنفيذ.
-3. **Optimization**: تحسين المسارات الساخنة عند تكرار التنفيذ.
-4. **Execution**: تشغيل التعليمات داخل Execution Context على Call Stack.
+### ما وظيفة compiler وما وظيفة interpreter؟
+الاثنان هدفهما واحد: تحويل الكود المكتوب من الإنسان إلى تعليمات قابلة للتنفيذ.
+- **Compiler**: يترجم الكود إلى مستوى أدنى قبل التنفيذ الكامل (أو قبل إعادة تشغيل الجزء الساخن) للحصول على أداء أعلى.
+- **Interpreter**: ينفذ التعليمات تدريجيا وبسرعة بدء أعلى عادة.
 
-<PhotoRenderer imageUrl="/images/advanced-js/engine-pipeline.png" altText="مراحل عمل محرك جافاسكربت" caption="من نص الكود إلى التنفيذ الفعلي داخل المحرك." />
+في JavaScript الحديثة، المحرك لا يختار واحدا فقط، بل يجمع بين الأسلوبين.
 
-### Creation Phase و Execution Phase
-قبل التنفيذ، يتم تجهيز البيئات:
-- تسجيل تعريفات الدوال.
-- إنشاء bindings للمتغيرات.
-- تعيين var إلى undefined مبدئيا.
-- وضع let و const في TDZ حتى سطر التعريف.
+### الفرق بينهما بشكل عملي
+1. **توقيت الترجمة**:
+- Compiler: قبل التنفيذ الكامل للجزء المستهدف أو قبل النسخة المحسنة.
+- Interpreter: أثناء التنفيذ خطوة بخطوة.
+2. **سرعة البداية**:
+- المسار التفسيري يبدأ بسرعة.
+- التحسين العميق يحتاج وقت warm-up.
+3. **الأداء النهائي**:
+- الكود المحسّن بالترجمة غالبا أسرع في المسارات المتكررة.
+- التنفيذ التفسيري وحده أبطأ غالبا في الأحمال العالية.
+4. **المرونة مقابل الافتراضات**:
+- interpreter مرن للبداية.
+- optimizer يعتمد على افتراضات runtime وقد يلغيها إذا تغيّرت الأنواع.
+
+<PhotoRenderer imageUrl="/images/advanced-js/engine-pipeline.png" altText="مسار تنفيذ جافاسكربت من parsing إلى JIT optimization" caption="المحرك الحديث يجمع بين التفسير والترجمة عبر JIT." />
+
+### كيف يعمل JIT في JavaScript؟
+محركات مثل V8 و SpiderMonkey و JavaScriptCore تعمل غالبا بهذه الدورة:
+1. **Parsing** للكود ثم بناء AST.
+2. **Bytecode generation** ثم تشغيل سريع عبر interpreter/baseline tier.
+3. **Profiling** لسلوك التنفيذ (أنواع القيم، الدوال الساخنة، loops المتكررة).
+4. **Optimization** بتحويل المسارات الساخنة إلى machine code أسرع.
+5. **De-optimization** إذا انهارت الافتراضات (مثلا كانت المدخلات أرقاما ثم أصبحت strings).
 
 <CodeBlock language="javascript">
-// الخطوة 1: global context تم إنشاؤه.
-console.log(total); // undefined لأن var تم تسجيله مسبقا.
-
-// console.log(rate); // ReferenceError لأن let داخل TDZ قبل التعريف.
-
-var total = 100; // الخطوة 2: التعيين يحدث أثناء التنفيذ.
-let rate = 0.15; // الخطوة 3: خرجت من TDZ.
-
-function calcTax() {
-  // الخطوة 4: إنشاء function execution context جديد.
-  const tax = total * rate;
-  return tax;
+function add(a, b) {
+  return a + b;
 }
 
-console.log(calcTax()); // الخطوة 5: push ثم pop من الـ stack.
+console.log(add(1, 2));
+console.log(add(3, 4));
+
+for (let i = 0; i < 100000; i += 1) {
+  add(i, i + 1); // hot path
+}
+
+console.log(add('1', 2)); // تغيير النوع قد يسبب de-optimization
 </CodeBlock>
 
-<InfoCallout type="warning" title="خطأ شائع">
-Hoisting لا يعني نقل السطر للأعلى. المقصود هو إنشاء binding مبكرا في مرحلة التهيئة. الفرق الحقيقي في حالة binding: هل هو initialized أم لا.
+### Call Stack بالتفصيل
+JavaScript على main thread تنفذ frame واحد فقط في كل لحظة.
+
+كل stack frame يحتوي غالبا على:
+- موقع التنفيذ الحالي.
+- معاملات الدالة والمتغيرات المحلية.
+- مرجع lexical environment الخارجي.
+- عنوان الرجوع بعد انتهاء الدالة.
+
+تسلسل التنفيذ:
+1. إنشاء Global Execution Context ودفعه للـ stack.
+2. كل استدعاء دالة يضيف frame جديد (push).
+3. التنفيذ دائما في أعلى stack.
+4. عند return يتم حذف frame الحالي (pop) والعودة للسابق.
+5. recursion بدون stop condition قد يؤدي إلى stack overflow.
+
+<CodeBlock language="javascript">
+function c() {
+  console.log('c start');
+  console.log('c end');
+}
+
+function b() {
+  console.log('b start');
+  c();
+  console.log('b end');
+}
+
+function a() {
+  console.log('a start');
+  b();
+  console.log('a end');
+}
+
+console.log('global start');
+a();
+console.log('global end');
+</CodeBlock>
+
+### ما هو hoisting فعليا؟
+Hoisting لا يعني نقل الأسطر لأعلى الملف. المعنى الصحيح: إنشاء bindings أثناء creation phase.
+
+- **function declaration**: binding جاهز بقيمة دالة ويمكن استدعاؤه مبكرا.
+- **var**: binding موجود ومهيأ بـ \`undefined\`.
+- **let/const**: binding موجود لكنه غير مهيأ داخل TDZ حتى يصل التنفيذ لسطر التعريف.
+- **function expression**: تتبع نوع المتغير الحامل لها (var أو let/const).
+
+<InfoCallout type="warning" title="أشهر سوء فهم">
+وجود binding لا يعني أن القيمة قابلة للاستخدام. داخل TDZ، القراءة تسبب ReferenceError حتى لو تم إنشاء binding فعلا.
 </InfoCallout>
+
+<CodeBlock language="javascript">
+console.log(total); // undefined
+// console.log(rate); // ReferenceError
+console.log(sum(2, 3)); // 5
+
+var total = 100;
+let rate = 0.15;
+
+function sum(x, y) {
+  return x + y;
+}
+
+// console.log(multiply(2, 3));
+// TypeError إذا كانت var قبل assignment.
+var multiply = function (x, y) {
+  return x * y;
+};
+</CodeBlock>
 `,
     practicalExercise: `
-ابن أداة صغيرة اسمها Runtime Trace:
-- اكتب 5 دوال تستدعي بعضها.
-- دوّن توقعك لترتيب stack frame قبل التنفيذ.
-- أضف أمثلة var و let و const و function declaration و function expression.
-- صنّف كل سطر: قيمة، undefined، ReferenceError، TypeError.
+ابن سكربت تدريبي باسم Engine Notes يوضح: compiler vs interpreter، JIT، Call Stack، و hoisting.
+
+المطلوب:
+- اكتب شرحا قصيرا (في comments) عن وظيفة compiler ووظيفة interpreter مع فرق عملي واحد لكل منهما.
+- أنشئ دالة تُستدعى كثيرا بنفس أنواع المدخلات ثم استدعاء مختلف النوع لمناقشة de-optimization.
+- اكتب 5 دوال متداخلة وسجّل ترتيب push/pop للـ stack قبل التنفيذ.
+- أضف أمثلة hoisting لـ var و let و const و function declaration و function expression.
+- صنّف النتيجة المتوقعة لكل سطر: value، undefined، ReferenceError، TypeError.
 
 معيار النجاح:
-- تتطابق التوقعات مع النتائج.
-- تشرح أي فرق باستخدام creation phase و TDZ.
+- تقدر تشرح الفرق بين compiler و interpreter بكلماتك.
+- تشرح أين JIT يحسن الأداء ومتى قد يحدث de-optimization.
+- تتطابق توقعاتك للـ stack والـ hoisting مع النتائج الفعلية.
 `,
   },
   {
