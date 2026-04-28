@@ -435,7 +435,7 @@ export default function HomePage() {
             glowColor="linear-gradient(135deg, rgba(217,119,6,0.6), rgba(251,191,36,0.3))"
             badgeColor="rgba(251,191,36,0.15)"
             codeSnippet={jsCode}
-            onClick={() => goToLesson('/js/1')}
+            onClick={() => goToLesson('/js/lessons')}
             delay={0.65}
           />
           <PathCard

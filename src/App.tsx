@@ -137,12 +137,7 @@ const JsArrayMethodsExercise1 = lazyRetry(
 const JsDebuggingExercise1 = lazyRetry(
   () => import('./lessons/javascript/JsDebuggingExercise1'),
 );
-const AdvancedJavaScriptPage = lazyRetry(
-  () => import('./pages/AdvancedJavaScriptPage'),
-);
-const JavaScriptLessonsPage = lazyRetry(
-  () => import('./pages/JavaScriptLessonsPage'),
-);
+const JsRoadmapPage = lazyRetry(() => import('./pages/JsRoadmapPage'));
 const AdvancedJsLesson1 = lazyRetry(
   () => import('./lessons/advanced-js/AdvancedJsLesson1'),
 );
@@ -338,7 +333,7 @@ const normalizeJsLessonNum = (raw: string | undefined): string | null => {
 
 const advancedSidebarShortNames: Record<string, string> = {
   'adv-js-1': 'محرك JavaScript',
-  'adv-js-2': 'بيئة المتصفح',
+  'adv-js-2': 'Closures و Web APIs',
   'adv-js-3': 'الدوال المغلقة',
   'adv-js-4': 'أحداث DOM',
   'adv-js-5': 'النماذج الوراثية',
@@ -1278,7 +1273,7 @@ function App() {
                     path="lessons"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <JavaScriptLessonsPage />
+                        <JsRoadmapPage />
                       </Suspense>
                     }
                   />
@@ -1287,7 +1282,7 @@ function App() {
                     path="advanced"
                     element={
                       <Suspense fallback={<LazyFallback />}>
-                        <AdvancedJavaScriptPage />
+                        <JsRoadmapPage />
                       </Suspense>
                     }
                   />

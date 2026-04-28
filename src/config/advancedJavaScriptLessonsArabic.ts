@@ -150,19 +150,19 @@ var multiply = function (x, y) {
   },
   {
     id: 'adv-js-2',
-    title: 'بيئة المتصفح و Window Object (DOM و Web APIs)',
+    title: 'Closures + Web APIs (نطاقات الإغلاق والتعامل مع callbacks)',
     description:
-      'فهم الحدود بين لغة JavaScript نفسها وبين APIs التي يوفرها المتصفح.',
+      'فهم كيف تحتفظ الدوال الداخلية بالحالة، وكيف تُستدعى لاحقا عبر Web APIs مثل click و setTimeout.',
     objectives: [
-      'التفريق بين اللغة الأساسية وBrowser Host APIs.',
-      'شرح دور window و document في تطبيقات الويب.',
-      'كتابة كود أقل اقترانا بالمتصفح وأكثر قابلية للاختبار.',
+      'فهم lexical scope وكيفية تكوين closure.',
+      'ربط closure بسيناريوهات callbacks القادمة من Web APIs.',
+      'كتابة كود أوضح بتقليل الاعتماد على المتغيرات العامة.',
     ],
     deepDiveTheory: `
 ### JavaScript ليست DOM
-لغة JavaScript لا تحتوي document أو fetch بحد ذاتها. هذه تأتي من البيئة المضيفة (المتصفح). لذلك يجب التفريق بين منطق اللغة ومنطق المنصة.
+لغة JavaScript لا تحتوي document أو setTimeout بحد ذاتها. هذه تأتي من البيئة المضيفة (المتصفح). لذلك يجب التفريق بين منطق اللغة ومنطق المنصة.
 
-<PhotoRenderer imageUrl="/images/advanced-js/browser-host-model.png" altText="علاقة المحرك بواجهات المتصفح" caption="المحرك ينفذ اللغة، والمتصفح يضيف Web APIs مثل DOM و fetch." />
+<PhotoRenderer imageUrl="/images/advanced-js/browser-host-model.png" altText="علاقة المحرك بواجهات المتصفح" caption="المحرك ينفذ اللغة، والمتصفح يضيف Web APIs مثل DOM و timers." />
 
 ### دور window
 الكائن window يمثل:
@@ -192,7 +192,7 @@ const appConfig = { apiBase: '/api' };
     practicalExercise: `
 أنشئ mini app من طبقتين:
 - طبقة logic: تحويل بيانات الطلاب (بدون DOM).
-- طبقة browser adapter: fetch + render داخل الصفحة.
+- طبقة browser adapter: setTimeout + render داخل الصفحة.
 
 المطلوب:
 - listener واحد delegated.

@@ -1,10 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import PhotoRenderer from '../../components/PhotoRenderer';
-import {
-  advancedJavaScriptLessonsDetailed,
-  type AdvancedJavaScriptLesson,
-} from '../../config/advancedJavaScriptLessons';
+import { type AdvancedJavaScriptLesson } from '../../config/advancedJavaScriptLessons';
 import { advancedJavaScriptLessonsArabic } from '../../config/advancedJavaScriptLessonsArabic';
 import { AnswerKey } from '../../features/code/AnswerKey';
 import CodeEditor from '../../features/code/CodeEditor';
@@ -365,27 +362,11 @@ const accentClassMap = {
   },
 };
 
-function getLessonLocale(): 'en' | 'ar' {
-  if (typeof window === 'undefined') return 'en';
-  const cached = localStorage.getItem('advanced_js_locale');
-  return cached === 'ar' ? 'ar' : 'en';
-}
-
 export default function AdvancedJsLessonTemplate({
   lessonId,
   lessonNum,
   accent,
 }: AdvancedJsLessonTemplateProps) {
-  const locale = getLessonLocale();
-
-  const englishMap = useMemo(
-    () =>
-      Object.fromEntries(
-        advancedJavaScriptLessonsDetailed.map((lesson) => [lesson.id, lesson]),
-      ) as Record<string, AdvancedJavaScriptLesson>,
-    [],
-  );
-
   const arabicMap = useMemo(
     () =>
       Object.fromEntries(
@@ -394,9 +375,7 @@ export default function AdvancedJsLessonTemplate({
     [],
   );
 
-  const lesson =
-    (locale === 'ar' ? arabicMap[lessonId] : englishMap[lessonId]) ??
-    englishMap[lessonId];
+  const lesson = arabicMap[lessonId] ?? advancedJavaScriptLessonsArabic[0];
 
   const exerciseConfig: AdvancedLessonExerciseConfig =
     advancedLessonExercises[lessonId] ?? advancedLessonExercises['adv-js-1'];
@@ -414,7 +393,7 @@ export default function AdvancedJsLessonTemplate({
   return (
     <div
       className="space-y-6"
-      dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      dir="rtl"
     >
       <section
         className={`relative isolate overflow-hidden rounded-3xl border bg-linear-to-br p-6 shadow-sm ${accentClasses.card}`}
@@ -434,13 +413,13 @@ export default function AdvancedJsLessonTemplate({
             <span
               className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold ${accentClasses.badge}`}
             >
-              Advanced JavaScript • Lesson {lessonNum}
+              JavaScript المتقدم • الدرس {lessonNum}
             </span>
             <Link
               to="/js/advanced"
               className="rounded-lg border border-white/70 bg-white/70 px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-white"
             >
-              {locale === 'ar' ? '📚 فهرس المسار' : '📚 Module Map'}
+              📚 فهرس المسار
             </Link>
           </div>
 
@@ -466,7 +445,9 @@ export default function AdvancedJsLessonTemplate({
       </section>
 
       <section className="space-y-2">
-        <h3 className="text-xl font-black text-gray-800">Deep Dive Theory</h3>
+        <h3 className="text-xl font-black text-gray-800">
+          الشرح النظري المتعمق
+        </h3>
         <div>{renderTheory(lesson.deepDiveTheory, `${lessonId}-theory`)}</div>
       </section>
 
@@ -585,7 +566,7 @@ ${exerciseConfig.keyTerms[2]}`}
 
       <section className="space-y-2">
         <h3 className="text-xl font-black text-gray-800">
-          Practical Exercise Brief
+          ملخص التمرين العملي
         </h3>
         <div>
           {renderTheory(lesson.practicalExercise, `${lessonId}-practice-brief`)}

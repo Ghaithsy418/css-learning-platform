@@ -82,7 +82,7 @@ export const advancedJsQuizzes: Record<string, AdvancedLessonQuizConfig> = {
   },
   'adv-js-2': {
     lessonId: 'adv-js-2',
-    lessonTitle: 'The Browser Environment & The Window Object',
+    lessonTitle: 'Closures + Timers',
     questions: [
       {
         question: 'أي كائن يمثل global object في browser main thread؟',
@@ -92,9 +92,9 @@ export const advancedJsQuizzes: Record<string, AdvancedLessonQuizConfig> = {
       },
       {
         question: 'أي من التالي هو Web API من المتصفح وليس من اللغة الأساسية؟',
-        options: ['Array.map', 'Promise', 'fetch', 'Object.keys'],
+        options: ['Array.map', 'Promise', 'setTimeout', 'Object.keys'],
         correctIndex: 2,
-        explanation: 'fetch API مقدم من host environment (المتصفح).',
+        explanation: 'setTimeout API مقدم من host environment (المتصفح).',
       },
       {
         question: 'ما الفرق الصحيح بين JavaScript engine و DOM؟',

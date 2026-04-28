@@ -206,7 +206,7 @@ The browser parses HTML into a tree of nodes. JavaScript manipulates that tree t
 - Event listeners retain references, affecting memory.
 
 ### Web APIs and asynchronous boundaries
-When you call fetch or setTimeout, the browser schedules work outside the synchronous call stack and returns control. Completion callbacks later re-enter JavaScript via event loop queues.
+When you call setTimeout, the browser schedules work outside the synchronous call stack and returns control. Completion callbacks later re-enter JavaScript via the task queue.
 
 <CodeBlock language="javascript">
 // Step 1: Synchronous execution starts.
@@ -218,15 +218,11 @@ setTimeout(function () {
   console.log('Timer finished');
 }, 0);
 
-// Step 3: fetch delegates network work to browser networking layer.
-fetch('/api/health')
-  .then(function (response) {
-    // Step 6: Promise continuation runs in microtask queue.
-    return response.text();
-  })
-  .then(function (text) {
-    console.log('Fetch result:', text);
-  });
+// Step 3: setTimeout delegates delayed work to the browser timer queue.
+setTimeout(function () {
+  // Step 6: callback re-enters JS later through the task queue.
+  console.log('Timer finished');
+}, 1500);
 
 // Step 4: synchronous code completes first.
 console.log('End');
@@ -245,18 +241,18 @@ Once you separate language from host, your code becomes portable and testable:
     practicalExercise: `
 Create a "host boundaries" mini app:
 - A pure function module that formats user records.
-- A browser adapter module that fetches records and renders to DOM.
+- A browser adapter module that delays UI updates with setTimeout and renders to DOM.
 - A global diagnostics panel showing window.location, navigator.userAgent, and document.visibilityState.
 
 Challenge rules:
 - Keep business logic independent from document and window.
 - Use one delegated click listener for all row actions.
-- Log every async boundary (timer start/end, fetch start/end).
+- Log every async boundary (timer start/end, callback resume/end).
 
 Success criteria:
-- You can swap DOM rendering with console rendering without touching core logic.
+- You can swap delayed UI rendering with console rendering without touching core logic.
 - No accidental globals are created.
-- The app remains responsive while network requests run.
+- The app remains responsive while timers run.
 `,
   },
   {
